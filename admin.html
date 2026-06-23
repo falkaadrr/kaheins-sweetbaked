@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Kaheins Sweetbaked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --white:#fff;--pink:#FF5BA3;--pink-soft:#FFD6E8;--blue:#2D5BFF;--blue-soft:#CFE0FF;
+    --ink:#111;--border:3px solid #111;--sh:4px 4px 0 #111;--sh-lg:7px 7px 0 #111;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Space Grotesk",system-ui,sans-serif;color:var(--ink);background:#fff;
+    background-image:radial-gradient(var(--pink-soft) 1.4px,transparent 1.4px);background-size:24px 24px;
+    min-height:100vh;
+  }
+  h1,h2,h3,.disp{font-family:"Archivo Black",sans-serif;letter-spacing:-.5px}
+  button{font-family:"Space Grotesk",sans-serif;cursor:pointer}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px}
+
+  /* ---------- LOGIN ---------- */
+  .login-screen{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .login-card{background:#fff;border:var(--border);box-shadow:var(--sh-lg);width:min(400px,100%);padding:30px}
+  .login-badge{width:64px;height:64px;background:var(--pink);border:var(--border);box-shadow:var(--sh);
+    display:grid;place-items:center;font-size:2rem;transform:rotate(-6deg);margin-bottom:18px}
+  .login-card h1{font-size:1.5rem;margin-bottom:4px}
+  .login-card p{color:#666;font-size:.9rem;margin-bottom:22px}
+  .login-card label{display:block;font-weight:700;font-size:.85rem;margin-bottom:6px}
+  .login-card input{width:100%;border:var(--border);padding:12px 14px;font-size:1rem;font-family:inherit;box-shadow:var(--sh)}
+  .login-card input:focus{outline:none;background:var(--pink-soft)}
+  .login-card button{width:100%;margin-top:16px;background:var(--blue);color:#fff;border:var(--border);
+    box-shadow:var(--sh);font-family:"Archivo Black";font-size:1rem;padding:14px;
+    transition:transform .1s,box-shadow .1s}
+  .login-card button:hover{transform:translate(-2px,-2px);box-shadow:var(--sh-lg)}
+  .login-card button:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .login-card button:disabled{background:#bbb;transform:none;box-shadow:var(--sh)}
+  .login-err{color:#d11;font-weight:600;font-size:.85rem;margin-top:12px;min-height:1em}
+
+  /* ---------- APP ---------- */
+  #app{display:none}
+  .topbar{background:#fff;border-bottom:var(--border);position:sticky;top:0;z-index:20}
+  .topbar-in{max-width:1080px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Archivo Black";font-size:1.2rem}
+  .brand .b{width:38px;height:38px;background:var(--pink);border:var(--border);box-shadow:var(--sh);
+    display:grid;place-items:center;font-size:1.1rem;transform:rotate(-6deg)}
+  .logout{background:#fff;border:var(--border);box-shadow:var(--sh);font-weight:700;padding:8px 14px;font-size:.85rem;
+    transition:transform .08s,box-shadow .08s}
+  .logout:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:var(--pink);color:#fff}
+
+  .viewbar{display:flex;gap:8px;margin-bottom:18px}
+  .viewbar button{border:var(--border);background:#fff;box-shadow:var(--sh);padding:10px 18px;font-weight:700;font-size:.9rem;
+    transition:transform .08s,box-shadow .08s}
+  .viewbar button:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .viewbar button.active{background:var(--ink);color:#fff}
+
+  /* stats */
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .stat{border:var(--border);box-shadow:var(--sh);background:#fff;padding:10px 16px;min-width:110px}
+  .stat b{display:block;font-family:"Archivo Black";font-size:1.4rem}
+  .stat span{font-size:.78rem;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .stat.p{background:var(--pink-soft)} .stat.b{background:var(--blue-soft)}
+
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .bar button{border:var(--border);background:#fff;box-shadow:var(--sh);padding:8px 13px;font-weight:600;font-size:.85rem}
+  .bar button.active{background:var(--pink);color:#fff}
+  .exportbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .exportbar button{border:var(--border);box-shadow:var(--sh);padding:9px 15px;font-weight:700;font-size:.85rem;color:#fff;
+    transition:transform .08s,box-shadow .08s}
+  .exportbar button:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .exportbar .xls{background:#1D9E75} .exportbar .pdf{background:#E24B4A}
+
+  .card{border:var(--border);box-shadow:var(--sh);background:#fff;padding:16px;margin-bottom:14px}
+  .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+  .ttl{font-family:"Archivo Black";font-size:1.05rem}
+  .muted{color:#555;font-size:.85rem}
+  .pill{display:inline-block;border:2px solid var(--ink);padding:3px 10px;font-size:.7rem;font-weight:700;
+    text-transform:uppercase;border-radius:20px;white-space:nowrap}
+  .ordbody{display:flex;gap:14px;margin:12px 0;flex-wrap:wrap}
+  .items{flex:1;min-width:200px;font-size:.9rem}
+  .items div{padding:2px 0}
+  .tot{font-family:"Archivo Black";font-size:1.05rem;margin-top:6px}
+
+  /* proof thumbnail */
+  .proof-thumb{width:96px;height:96px;object-fit:cover;border:var(--border);box-shadow:var(--sh);cursor:zoom-in;
+    transition:transform .08s}
+  .proof-thumb:hover{transform:scale(1.03)}
+  .proof-none{width:96px;height:96px;border:3px dashed #bbb;display:grid;place-items:center;text-align:center;
+    color:#999;font-size:.72rem;padding:6px;font-weight:600}
+
+  .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .acts button{border:var(--border);padding:6px 11px;font-weight:600;font-size:.8rem;background:#fff;
+    transition:transform .07s}
+  .acts button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .acts button.go{background:#25D366;color:#fff}
+  .acts button.danger{background:#F7C1C1}
+
+  .empty{text-align:center;padding:50px;color:#777;border:3px dashed #ccc;background:#fff}
+  .err{background:#ffe0e0;border:var(--border);padding:12px;margin-bottom:16px;font-weight:600}
+
+  /* status colors */
+  .s-pending{background:#eee} .s-waiting_confirmation{background:#FAC775}
+  .s-paid{background:#9FE1CB} .s-processing{background:#B5D4F4}
+  .s-shipped{background:#CECBF6} .s-done{background:#C0DD97} .s-cancelled{background:#F7C1C1}
+
+  /* voucher form */
+  .vform{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .vform input,.vform select{border:var(--border);padding:10px 11px;font-size:.9rem;font-family:inherit}
+  .vform input:focus,.vform select:focus{outline:none;background:var(--pink-soft)}
+  .vform #vCode{grid-column:1/-1;text-transform:uppercase}
+  .vform #btnAddVoucher{grid-column:1/-1;background:var(--blue);color:#fff;border:var(--border);box-shadow:var(--sh);
+    font-family:"Archivo Black";padding:12px;transition:transform .08s}
+  .vform #btnAddVoucher:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .vcode{font-family:"Archivo Black";font-size:1.1rem}
+  .voff{opacity:.55}
+
+  /* lightbox */
+  .lightbox{position:fixed;inset:0;background:rgba(17,17,17,.85);z-index:50;display:none;place-items:center;padding:24px;cursor:zoom-out}
+  .lightbox.show{display:grid}
+  .lightbox img{max-width:100%;max-height:90vh;border:var(--border);box-shadow:var(--sh-lg);background:#fff}
+  .lightbox .lb-close{position:absolute;top:18px;right:18px;background:#fff;border:var(--border);box-shadow:var(--sh);
+    width:44px;height:44px;font-family:"Archivo Black";font-size:1.1rem}
+
+  @media(max-width:560px){
+    .vform{grid-template-columns:1fr}
+    .proof-thumb,.proof-none{width:100%;height:140px}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-badge">🍪</div>
+      <h1>Admin Dashboard</h1>
+      <p>Kaheins Sweetbaked — masuk untuk kelola pesanan & voucher.</p>
+      <label for="loginInput">Admin Token</label>
+      <input type="password" id="loginInput" placeholder="Masukkan token admin" />
+      <button id="loginBtn">Masuk</button>
+      <div class="login-err" id="loginErr"></div>
+    </div>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div id="app">
+    <div class="topbar">
+      <div class="topbar-in">
+        <div class="brand"><span class="b">🍪</span> Kaheins Admin</div>
+        <button class="logout" id="logoutBtn">Keluar</button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div id="errBox"></div>
+
+      <div class="viewbar">
+        <button data-v="orders" class="active">📦 Pesanan</button>
+        <button data-v="vouchers">🎫 Voucher</button>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="ordersView">
+        <div class="stats" id="stats"></div>
+        <div class="bar" id="filterBar">
+          <button data-f="" class="active">Semua</button>
+          <button data-f="waiting_confirmation">Perlu dicek</button>
+          <button data-f="paid">Sudah bayar</button>
+          <button data-f="processing">Diproses</button>
+          <button data-f="shipped">Dikirim</button>
+          <button data-f="done">Selesai</button>
+        </div>
+        <div class="exportbar">
+          <button class="xls" id="btnExcel">⬇ Export Excel</button>
+          <button class="pdf" id="btnPdf">⬇ Export PDF</button>
+        </div>
+        <div id="list"></div>
+      </div>
+
+      <!-- VOUCHERS -->
+      <div id="vouchersView" style="display:none">
+        <div class="card">
+          <div class="ttl" style="margin-bottom:12px">+ Tambah Voucher</div>
+          <div class="vform">
+            <input id="vCode" placeholder="KODE (cth: KAHEINS10)" />
+            <select id="vType">
+              <option value="percent">Persen (%)</option>
+              <option value="fixed">Potongan (Rp)</option>
+            </select>
+            <input id="vValue" type="number" placeholder="Nilai (10 atau 5000)" />
+            <input id="vMin" type="number" placeholder="Min. belanja (Rp)" />
+            <input id="vLabel" placeholder="Label (cth: Diskon 10%)" />
+            <button id="btnAddVoucher">Simpan Voucher</button>
+          </div>
+        </div>
+        <div id="voucherList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lbClose">✕</button>
+    <img id="lightboxImg" alt="Bukti pembayaran" />
+  </div>
+
+<script>
+  const API = ""; // origin yang sama
+  const TOKEN_KEY = "kaheins_admin_token";
+  let token = localStorage.getItem(TOKEN_KEY) || "";
+  let filter = "";
+  let lastOrders = [];
+
+  const rupiah = (n) => "Rp " + Number(n).toLocaleString("id-ID");
+  const $ = (id) => document.getElementById(id);
+
+  const loginScreen = $("loginScreen");
+  const app = $("app");
+  const errBox = $("errBox");
+  const list = $("list");
+  const voucherList = $("voucherList");
+
+  function showErr(msg){ errBox.innerHTML = msg ? `<div class="err">${msg}</div>` : ""; }
+
+  // ---------- LOGIN ----------
+  async function tryAuth(t){
+    const res = await fetch(API + "/api/admin/orders", { headers: { "x-admin-token": t } });
+    return res.status !== 401;
+  }
+  function showApp(){ loginScreen.style.display = "none"; app.style.display = "block"; }
+  function showLogin(){ app.style.display = "none"; loginScreen.style.display = "grid"; }
+
+  async function doLogin(){
+    const t = $("loginInput").value.trim();
+    const errEl = $("loginErr");
+    errEl.textContent = "";
+    if(!t){ errEl.textContent = "Masukin token dulu ya."; return; }
+    const btn = $("loginBtn");
+    btn.disabled = true; btn.textContent = "Mengecek...";
+    try{
+      if(!(await tryAuth(t))){ errEl.textContent = "Token salah. Coba lagi."; return; }
+      token = t; localStorage.setItem(TOKEN_KEY, token);
+      showApp(); load();
+    }catch(e){ errEl.textContent = "Gagal konek ke server."; }
+    finally{ btn.disabled = false; btn.textContent = "Masuk"; }
+  }
+  $("loginBtn").addEventListener("click", doLogin);
+  $("loginInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
+  $("logoutBtn").addEventListener("click", ()=>{
+    token = ""; localStorage.removeItem(TOKEN_KEY);
+    $("loginInput").value = ""; showLogin();
+  });
+
+  // ---------- VIEW SWITCH ----------
+  document.querySelectorAll(".viewbar button").forEach((b)=>{
+    b.addEventListener("click", ()=>{
+      document.querySelectorAll(".viewbar button").forEach((x)=>x.classList.remove("active"));
+      b.classList.add("active");
+      const v = b.dataset.v;
+      $("ordersView").style.display = v==="orders" ? "block" : "none";
+      $("vouchersView").style.display = v==="vouchers" ? "block" : "none";
+      if(v==="vouchers") loadVouchers();
+    });
+  });
+
+  // ---------- FILTERS ----------
+  document.querySelectorAll("#filterBar button").forEach((b)=>{
+    b.addEventListener("click", ()=>{
+      document.querySelectorAll("#filterBar button").forEach((x)=>x.classList.remove("active"));
+      b.classList.add("active");
+      filter = b.dataset.f; load();
+    });
+  });
+
+  // ---------- LOAD ORDERS ----------
+  async function load(){
+    if(!token) return;
+    showErr("");
+    try{
+      const url = API + "/api/admin/orders" + (filter ? "?status="+filter : "");
+      const res = await fetch(url, { headers: { "x-admin-token": token } });
+      if(res.status === 401){ showLogin(); return; }
+      const data = await res.json();
+      lastOrders = data.orders || [];
+      renderStats(lastOrders);
+      renderOrders(lastOrders);
+    }catch(e){ showErr("Gagal memuat data. Cek koneksi / server."); }
+  }
+
+  function renderStats(orders){
+    const total = orders.length;
+    const cek = orders.filter((o)=>o.status==="waiting_confirmation").length;
+    const omzet = orders.filter((o)=>["paid","processing","shipped","done"].includes(o.status))
+      .reduce((s,o)=>s+o.total,0);
+    $("stats").innerHTML = `
+      <div class="stat p"><b>${total}</b><span>Pesanan (view ini)</span></div>
+      <div class="stat b"><b>${cek}</b><span>Perlu dicek</span></div>
+      <div class="stat"><b>${rupiah(omzet)}</b><span>Omzet (terbayar)</span></div>`;
+  }
+
+  function fmtDate(s){ return new Date(s).toLocaleString("id-ID"); }
+
+  function renderOrders(orders){
+    if(!orders.length){ list.innerHTML = `<div class="empty">Belum ada pesanan di filter ini.</div>`; return; }
+    list.innerHTML = orders.map((o)=>{
+      const items = (o.order_items||[]).map((i)=>`<div>• ${i.product_name} ×${i.qty} — ${rupiah(i.line_total)}</div>`).join("");
+      const disc = o.discount>0 ? `<div class="muted">Voucher ${o.voucher_code}: -${rupiah(o.discount)}</div>` : "";
+      const proof = o.proof_url
+        ? `<img class="proof-thumb" src="${o.proof_url}" alt="bukti" onclick="openLightbox('${o.proof_url}')" />`
+        : `<div class="proof-none">Belum ada bukti bayar</div>`;
+      return `
+      <div class="card">
+        <div class="row">
+          <div>
+            <div class="ttl">${o.customer_name} <span class="muted">· #${String(o.id).slice(0,8).toUpperCase()}</span></div>
+            <div class="muted">${o.customer_address}</div>
+            ${o.customer_phone ? `<div class="muted">📞 ${o.customer_phone}</div>` : ""}
+            <div class="muted">${fmtDate(o.created_at)}</div>
+          </div>
+          <span class="pill s-${o.status}">${o.status.replace(/_/g," ")}</span>
+        </div>
+        <div class="ordbody">
+          <div>${proof}</div>
+          <div class="items">${items}${disc}<div class="tot">Total: ${rupiah(o.total)}</div></div>
+        </div>
+        <div class="acts">
+          <button class="go" onclick="setStatus('${o.id}','paid')">✓ Konfirmasi bayar</button>
+          <button onclick="setStatus('${o.id}','processing')">Diproses</button>
+          <button onclick="setStatus('${o.id}','shipped')">Dikirim</button>
+          <button onclick="setStatus('${o.id}','done')">Selesai</button>
+          <button class="danger" onclick="setStatus('${o.id}','cancelled')">Batalkan</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  window.setStatus = async (id, status)=>{
+    try{
+      const res = await fetch(API + "/api/admin/orders/"+id, {
+        method:"PATCH",
+        headers:{ "Content-Type":"application/json", "x-admin-token":token },
+        body: JSON.stringify({ status }),
+      });
+      if(!res.ok){ const d = await res.json().catch(()=>({})); showErr(d.error||"Gagal update status."); return; }
+      load();
+    }catch(e){ showErr("Gagal update status."); }
+  };
+
+  // ---------- LIGHTBOX ----------
+  const lightbox = $("lightbox");
+  window.openLightbox = (url)=>{ $("lightboxImg").src = url; lightbox.classList.add("show"); };
+  function closeLightbox(){ lightbox.classList.remove("show"); $("lightboxImg").src=""; }
+  lightbox.addEventListener("click",(e)=>{ if(e.target===lightbox) closeLightbox(); });
+  $("lbClose").addEventListener("click", closeLightbox);
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeLightbox(); });
+
+  // ---------- EXPORT ----------
+  const fmtItems = (o)=>(o.order_items||[]).map((i)=>`${i.product_name} x${i.qty}`).join("; ");
+  const stamp = ()=>new Date().toISOString().slice(0,10);
+  function exportRows(){
+    return lastOrders.map((o)=>({
+      Tanggal: fmtDate(o.created_at),
+      Kode: "#"+String(o.id).slice(0,8).toUpperCase(),
+      Nama: o.customer_name, "No HP": o.customer_phone||"-",
+      Alamat: o.customer_address, Item: fmtItems(o), Voucher: o.voucher_code||"-",
+      Subtotal: o.subtotal, Diskon: o.discount, Total: o.total, Status: o.status,
+    }));
+  }
+  $("btnExcel").addEventListener("click", ()=>{
+    if(!lastOrders.length) return;
+    const ws = XLSX.utils.json_to_sheet(exportRows());
+    ws["!cols"] = [{wch:18},{wch:10},{wch:20},{wch:15},{wch:32},{wch:34},{wch:12},{wch:11},{wch:10},{wch:11},{wch:16}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pesanan");
+    XLSX.writeFile(wb, `kaheins-pesanan-${stamp()}.xlsx`);
+  });
+  $("btnPdf").addEventListener("click", ()=>{
+    if(!lastOrders.length) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:"landscape" });
+    doc.setFontSize(14); doc.text("Kaheins Sweetbaked — Daftar Pesanan", 14, 14);
+    doc.setFontSize(9); doc.text(`Diekspor: ${new Date().toLocaleString("id-ID")} · ${lastOrders.length} pesanan`, 14, 20);
+    const rows = lastOrders.map((o)=>[
+      fmtDate(o.created_at), "#"+String(o.id).slice(0,8).toUpperCase(), o.customer_name,
+      o.customer_phone||"-", fmtItems(o), o.voucher_code||"-", rupiah(o.total), o.status,
+    ]);
+    doc.autoTable({
+      head:[["Tanggal","Kode","Nama","No HP","Item","Voucher","Total","Status"]],
+      body:rows, startY:26, styles:{fontSize:8,cellPadding:2,overflow:"linebreak"},
+      headStyles:{fillColor:[45,91,255]}, columnStyles:{4:{cellWidth:70},2:{cellWidth:32}},
+    });
+    doc.save(`kaheins-pesanan-${stamp()}.pdf`);
+  });
+
+  // ---------- VOUCHERS ----------
+  async function loadVouchers(){
+    try{
+      const res = await fetch(API + "/api/admin/vouchers", { headers:{ "x-admin-token":token } });
+      if(!res.ok){ showErr("Gagal memuat voucher."); return; }
+      const data = await res.json();
+      renderVouchers(data.vouchers||[]);
+    }catch(e){ showErr("Gagal memuat voucher."); }
+  }
+  function renderVouchers(vs){
+    if(!vs.length){ voucherList.innerHTML = `<div class="empty">Belum ada voucher. Tambah di atas ya.</div>`; return; }
+    voucherList.innerHTML = vs.map((v)=>{
+      const nilai = v.type==="percent" ? v.value+"%" : rupiah(v.value);
+      return `
+      <div class="card ${v.active?"":"voff"}">
+        <div class="row">
+          <div>
+            <div class="vcode">${v.code}</div>
+            <div class="muted">Potongan ${nilai} · min. ${rupiah(v.min_order)}${v.label?" · "+v.label:""}</div>
+            <div class="muted">${v.active?"🟢 Aktif":"⚪ Nonaktif"}</div>
+          </div>
+          <span class="pill ${v.active?"s-done":"s-cancelled"}">${v.active?"aktif":"nonaktif"}</span>
+        </div>
+        <div class="acts">
+          <button onclick="toggleVoucher('${v.code}', ${!v.active})">${v.active?"Nonaktifkan":"Aktifkan"}</button>
+          <button onclick="editVoucher('${v.code}', ${v.value}, ${v.min_order})">Edit nilai</button>
+          <button class="danger" onclick="deleteVoucher('${v.code}')">Hapus</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  async function voucherReq(method, codePath, body){
+    const res = await fetch(API + "/api/admin/vouchers"+codePath, {
+      method, headers:{ "Content-Type":"application/json", "x-admin-token":token },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error||"Gagal");
+  }
+  $("btnAddVoucher").addEventListener("click", async ()=>{
+    showErr("");
+    const code = $("vCode").value.trim().toUpperCase();
+    const type = $("vType").value;
+    const value = Number($("vValue").value);
+    const min_order = Number($("vMin").value)||0;
+    const label = $("vLabel").value.trim();
+    if(!code || !value){ showErr("Isi minimal kode dan nilai voucher."); return; }
+    try{
+      await voucherReq("POST","",{ code, type, value, min_order, label });
+      $("vCode").value=""; $("vValue").value=""; $("vMin").value=""; $("vLabel").value="";
+      loadVouchers();
+    }catch(e){ showErr(e.message); }
+  });
+  window.toggleVoucher = async (code, active)=>{
+    try{ await voucherReq("PATCH","/"+code,{ active }); loadVouchers(); }catch(e){ showErr(e.message); }
+  };
+  window.deleteVoucher = async (code)=>{
+    if(!confirm(`Hapus voucher ${code}?`)) return;
+    try{ await voucherReq("DELETE","/"+code); loadVouchers(); }catch(e){ showErr(e.message); }
+  };
+  window.editVoucher = async (code, curVal, curMin)=>{
+    const value = prompt(`Nilai baru untuk ${code}:`, curVal); if(value===null) return;
+    const min_order = prompt(`Minimal belanja baru untuk ${code}:`, curMin); if(min_order===null) return;
+    try{ await voucherReq("PATCH","/"+code,{ value:Number(value), min_order:Number(min_order) }); loadVouchers(); }
+    catch(e){ showErr(e.message); }
+  };
+
+  // ---------- INIT ----------
+  (async function init(){
+    if(token && await tryAuth(token).catch(()=>false)){ showApp(); load(); }
+    else { showLogin(); }
+  })();
+</script>
+</body>
+</html>
