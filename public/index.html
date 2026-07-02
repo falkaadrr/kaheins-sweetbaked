@@ -1308,7 +1308,11 @@
           </div>
           <div>
             <label for="buyerPhone">No. WhatsApp / HP (opsional)</label>
-            <input type="tel" id="buyerPhone" placeholder="08xxxxxxxxxx" />
+            <input
+              type="tel"
+              id="buyerPhone"
+              placeholder="08xxxxxxxxxx"
+            />
           </div>
         </div>
         <button class="checkout" id="checkoutBtn" disabled>
@@ -1344,7 +1348,7 @@
           <div class="qris-box">
             <img
               id="qrisImg"
-              src="images/qris.jpeg"
+              src="images/qris.png"
               alt="QRIS Kaheins Sweetbaked"
               onerror="
                 this.style.display = 'none';
@@ -1359,7 +1363,7 @@
           <ol class="pay-steps">
             <li>Scan QRIS di atas, bayar sesuai total.</li>
             <li>Screenshot bukti pembayaran kamu.</li>
-            <li>Upload buktinya, lalu kirim ke WhatsApp.</li>
+            <li>Upload bukti — otomatis tersimpan ke sistem kami.</li>
           </ol>
           <label class="upload-label" id="uploadLabel">
             <i data-feather="upload"></i>
@@ -1373,12 +1377,11 @@
             <img id="proofImg" alt="Bukti pembayaran" />
           </div>
           <button class="checkout" id="sendOrderBtn">
-            <i data-feather="message-circle"></i> Kirim Pesanan ke WhatsApp
+            <i data-feather="message-circle"></i> Chat Admin via WhatsApp (opsional)
           </button>
           <p class="pay-note">
-            Di HP, tombol ini bisa langsung membagikan bukti + pesanan ke
-            WhatsApp. Kalau bukti tidak ikut otomatis, tinggal lampirkan
-            screenshot-nya di chat ya 🙏
+            Bukti bayar kamu sudah otomatis masuk ke sistem begitu di-upload.
+            Tombol ini opsional — buat chat admin langsung kalau mau konfirmasi 🙏
           </p>
         </div>
       </div>
@@ -1433,62 +1436,9 @@
       let currentOrder = null;
 
       // ====== DATA PRODUK ======
-      const products = [
-        {
-          id: 1,
-          name: "Classic Original",
-          emoji: "🍪",
-          image: "images/classic-cookies.png",
-          price: 7000,
-          desc: "Cookies cokelat klasik dengan tekstur lembut di dalam, sedikit renyah di luar, dan potongan cokelat melimpah di setiap gigitan. Simpel, hangat, dan selalu jadi favorit.",
-          bg: "bg-pink",
-        },
-        {
-          id: 2,
-          name: "Red Velvet Cheese",
-          emoji: "❤️",
-          image: "images/red-velvet.png",
-          price: 7000,
-          desc: "Cookies red velvet yang lembut dengan rasa manis khas cocoa, dipadukan dengan potongan white chocolate/cream cheese yang creamy. Perpaduan cantik antara manis, lembut, dan sedikit milky.",
-          bg: "bg-white",
-        },
-        {
-          id: 3,
-          name: "Blue Monstery",
-          emoji: "🍵",
-          image: "images/blue-monstery.png",
-          price: 7000,
-          desc: "Cookies blue velvet bertekstur soft dengan sensasi cokelat lumer di bagian tengah. Rasanya manis, unik, dan playful—cocok buat kamu yang suka cookies beda dari biasanya.",
-          bg: "bg-blue",
-        },
-        {
-          id: 4,
-          name: "Scoopable Classic Cookie",
-          emoji: "🍫",
-          image: "images/scoopable-cookies.png",
-          price: 10000,
-          desc: "Classic cookie versi scoopable dengan tekstur super lembut, chunky, dan penuh potongan cokelat di setiap sendokannya. Hangat, lumer, dan cocok buat pencinta cokelat sejati.",
-          bg: "bg-pink",
-        },
-        {
-          id: 5,
-          name: "Scoopable Red Velvet Cheese",
-          emoji: "🧈",
-          image: "images/scoopable-red.png",
-          price: 10000,
-          desc: "Red velvet scoopable yang lembut dan moist, dipadukan dengan topping creamy yang manis-gurih. Sensasinya lumer, rich, dan bikin tiap suapan terasa spesial.",
-          bg: "bg-white",
-        },
-        {
-          id: 6,
-          name: "Scoopable Blue Monstery",
-          emoji: "🌾",
-          image: "images/scoopable-blue.png",
-          price: 10000,
-          desc: "Blue velvet scoopable dengan tekstur lembut, padat, dan penuh potongan cokelat di atasnya. Manis, creamy, dan tampil beda dengan warna khas yang bikin penasaran sejak suapan pertama.",
-          bg: "bg-blue",
-        },
-      ];
+      // Produk diambil dari backend (/api/products). Diatur lewat dashboard admin.
+      let products = [];
+      const BG_ROTATION = ["bg-pink", "bg-white", "bg-blue"];
 
       // Coba .jpg -> .png dulu (kalau sumbernya .jpg), kalau tetap gagal tampilkan emoji
       function handleImgError(img, emoji) {
@@ -1514,24 +1464,56 @@
 
       // ====== RENDER PRODUK ======
       const grid = document.getElementById("productGrid");
-      products.forEach((p) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
+
+      function renderProducts() {
+        grid.innerHTML = "";
+        if (!products.length) {
+          grid.innerHTML =
+            '<p style="grid-column:1/-1;text-align:center;color:#888;padding:30px">Belum ada produk. Tambah lewat dashboard admin ya 🍪</p>';
+          return;
+        }
+        products.forEach((p, i) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          const img = p.image
+            ? `<img src="${p.image}" alt="${p.name}" onerror="handleImgError(this,'${p.emoji}')" />`
+            : `<span style="font-size:4rem">${p.emoji}</span>`;
+          card.innerHTML = `
       <div class="thumb ${p.bg}">
-        <img src="${p.image}" alt="${p.name}" onerror="handleImgError(this,'${p.emoji}')" />
+        ${img}
         <span class="price-chip">${rupiah(p.price)}</span>
       </div>
       <div class="body">
         <h3>${p.name}</h3>
-        <p class="desc">${p.desc}</p>
+        <p class="desc">${p.desc || ""}</p>
         <button class="add" data-id="${p.id}">
           <i data-feather="plus"></i> Tambah
         </button>
       </div>`;
-        grid.appendChild(card);
-      });
-      if (window.feather) feather.replace();
+          grid.appendChild(card);
+        });
+        if (window.feather) feather.replace();
+      }
+
+      async function loadProducts() {
+        try {
+          const res = await fetch(BACKEND_URL + "/api/products");
+          const json = await res.json();
+          products = (json.data || []).map((p, i) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            emoji: p.emoji || "🍪",
+            image: p.image_url || "",
+            desc: p.description || "",
+            bg: BG_ROTATION[i % BG_ROTATION.length],
+          }));
+        } catch (e) {
+          products = [];
+        }
+        renderProducts();
+      }
+      loadProducts();
 
       // ====== CART LOGIC ======
       const cartBody = document.getElementById("cartBody");
@@ -1674,8 +1656,7 @@
             const data = await res.json();
             if (!res.ok) {
               appliedVoucher = null;
-              voucherMsg.textContent =
-                "❌ " + (data.error || "Kode tidak valid");
+              voucherMsg.textContent = "❌ " + (data.error || "Kode tidak valid");
               voucherMsg.style.color = "#d11";
             } else {
               appliedVoucher = {
@@ -1759,7 +1740,7 @@
               phone: buyerPhoneInput ? buyerPhoneInput.value.trim() : "",
             },
             items: Object.keys(cart).map((id) => ({
-              id: Number(id),
+              id: id,
               qty: cart[id],
             })),
             voucher_code: appliedVoucher ? appliedVoucher.code : null,
@@ -1911,32 +1892,14 @@
         if (window.feather) feather.replace();
       });
 
-      // kirim ke WhatsApp: coba share gambar (HP), kalau gagal buka chat teks
+      // Bukti bayar sudah otomatis tersimpan ke database saat di-upload.
+      // Tombol ini cuma buka chat admin LANGSUNG (nomor sudah tetap), tanpa
+      // share sheet / milih kontak dulu.
       async function sendOrder() {
         const name = buyerNameInput.value.trim();
         const address = buyerAddressInput.value.trim();
-
-        if (
-          proofFile &&
-          navigator.canShare &&
-          navigator.canShare({ files: [proofFile] })
-        ) {
-          try {
-            await navigator.share({
-              files: [proofFile],
-              text: buildOrderText(name, address, false),
-              title: "Pesanan Kaheins Sweetbaked",
-            });
-            return; // berhasil dibagikan
-          } catch (err) {
-            if (err && err.name === "AbortError") return; // user batal, jangan buka apa-apa
-            // selain itu lanjut ke fallback wa.me
-          }
-        }
-
-        // Fallback: buka chat WhatsApp dengan teks pesanan + pengingat lampirkan bukti
         const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
-          buildOrderText(name, address, true),
+          buildOrderText(name, address, false),
         )}`;
         window.open(url, "_blank", "noopener");
       }
