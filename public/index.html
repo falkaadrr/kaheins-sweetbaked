@@ -1539,6 +1539,14 @@
       <div class="foot-bottom">© 2026 Kaheins Sweetbaked</div>
     </footer>
 
+    <!-- PROMO POPUP (muncul sekali per sesi) -->
+    <div class="promo-pop" id="promoPop">
+      <div class="promo-pop-card" id="promoPopCard">
+        <button class="pp-close" id="promoPopClose" aria-label="Tutup">✕</button>
+        <div id="promoPopContent"></div>
+      </div>
+    </div>
+
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
       // ====== KONFIGURASI ======
@@ -1758,8 +1766,10 @@
 
       (function initPromoPopup() {
         const pop = document.getElementById("promoPop");
+        const closeBtn = document.getElementById("promoPopClose");
+        if (!pop || !closeBtn) return; // aman kalau elemen belum ada
         const close = () => pop.classList.remove("show");
-        document.getElementById("promoPopClose").addEventListener("click", close);
+        closeBtn.addEventListener("click", close);
         pop.addEventListener("click", (e) => {
           if (e.target === pop) close();
         });
@@ -2171,12 +2181,5 @@
       renderCart();
       if (window.feather) feather.replace();
     </script>
-    <!-- PROMO POPUP (muncul sekali per sesi) -->
-    <div class="promo-pop" id="promoPop">
-      <div class="promo-pop-card" id="promoPopCard">
-        <button class="pp-close" id="promoPopClose" aria-label="Tutup">✕</button>
-        <div id="promoPopContent"></div>
-      </div>
-    </div>
   </body>
 </html>
