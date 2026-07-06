@@ -153,6 +153,11 @@
   .lightbox.show{display:grid} .lightbox img{max-width:100%;max-height:92vh;border-radius:10px}
 
 
+
+  .date-bar{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:#FCFCFE}
+  .date-lbl{font-weight:700;font-size:.82rem;color:var(--muted)}
+  .date-bar input[type=date]{color:var(--ink);cursor:pointer}
+
   .img-field{display:flex;flex-direction:column;gap:8px}
   .img-prev{width:100%;height:150px;border:1.5px dashed var(--line);border-radius:10px;display:grid;place-items:center;overflow:hidden;background:#FAFBFD;color:var(--muted);font-size:.82rem}
   .img-prev img{width:100%;height:100%;object-fit:cover}
@@ -208,7 +213,7 @@
         <div class="topbar">
           <div class="t-title">Content Management System</div>
           <div class="profile">
-            <div class="who" style="text-align:right"><b id="waName">Admin</b><span id="waRole">Admin Markom</span></div>
+            <div class="who" style="text-align:right"><b id="waName">Admin</b><span id="waRole">Administrator</span></div>
             <div class="av" id="waAvatar">A</div>
           </div>
         </div>
@@ -260,7 +265,7 @@
   function doLogout(){token="";me=null;localStorage.removeItem(TK);$("app").style.display="none";$("loginScreen").style.display="grid";}
   function enterApp(){
     $("loginScreen").style.display="none";$("app").style.display="block";
-    if(me){ $("waName").textContent=me.name||"Admin"; $("waRole").textContent=(me.role||"admin")==="admin"?"Admin Markom":me.role;
+    if(me){ $("waName").textContent=me.name||"Admin"; $("waRole").textContent=me.email||"Administrator";
       $("waAvatar").textContent=(me.name||me.email||"A").slice(0,1).toUpperCase(); }
     switchView("orders");
   }
@@ -284,7 +289,7 @@
   }
 
   // ================= ORDERS =================
-  let allOrders=[]; let orderFilter=""; let orderSearch="";
+  let allOrders=[]; let orderFilter=""; let orderSearch=""; let orderFrom=""; let orderTo="";
   async function viewOrders(){
     page.innerHTML=pageHead("Data Pesanan","Data Pesanan","Penjualan")+`
       <div class="stats" id="stats"></div>
@@ -300,6 +305,14 @@
             <button class="btn btn-soft" id="btnPdf">⬇ PDF</button>
           </div>
         </div>
+        <div class="date-bar">
+          <span class="date-lbl">📅 Filter tanggal:</span>
+          <input type="date" class="filter" id="ordFrom" value="${orderFrom}" />
+          <span class="muted">s/d</span>
+          <input type="date" class="filter" id="ordTo" value="${orderTo}" />
+          <button class="btn btn-line" id="ordDateClear">Reset</button>
+          <span class="muted" id="ordCount" style="margin-left:auto;font-size:.82rem"></span>
+        </div>
         <div class="tbl-wrap"><table>
           <thead><tr><th>Customer</th><th>Nomor Pesanan</th><th>Total</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody id="ordBody"></tbody>
@@ -307,9 +320,20 @@
       </div>`;
     $("ordSearch").addEventListener("input",(e)=>{orderSearch=e.target.value;renderOrderRows();});
     $("ordFilter").addEventListener("change",(e)=>{orderFilter=e.target.value;loadOrders();});
+    $("ordFrom").addEventListener("change",(e)=>{orderFrom=e.target.value;renderOrderRows();});
+    $("ordTo").addEventListener("change",(e)=>{orderTo=e.target.value;renderOrderRows();});
+    $("ordDateClear").addEventListener("click",()=>{orderFrom="";orderTo="";$("ordFrom").value="";$("ordTo").value="";renderOrderRows();});
     $("btnExcel").addEventListener("click",exportExcel);
     $("btnPdf").addEventListener("click",exportPdf);
     loadOrders();
+  }
+  // ambil tanggal lokal (YYYY-MM-DD) dari created_at
+  function orderDateKey(o){ const d=new Date(o.created_at); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+  function passDate(o){
+    const k=orderDateKey(o);
+    if(orderFrom && k<orderFrom) return false;
+    if(orderTo && k>orderTo) return false;
+    return true;
   }
   async function loadOrders(){
     try{
@@ -329,9 +353,10 @@
   }
   function renderOrderRows(){
     const q=orderSearch.trim().toLowerCase();
-    const rows=allOrders.filter((o)=>!q||(o.customer_name||"").toLowerCase().includes(q)||(o.order_no||"").toLowerCase().includes(q));
+    const rows=allOrders.filter((o)=>passDate(o) && (!q||(o.customer_name||"").toLowerCase().includes(q)||(o.order_no||"").toLowerCase().includes(q)));
+    const cnt=$("ordCount"); if(cnt) cnt.textContent=`${rows.length} pesanan`;
     const body=$("ordBody");
-    if(!rows.length){ body.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="big">🗒️</div>Belum ada pesanan.</div></td></tr>`; return; }
+    if(!rows.length){ body.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="big">🗒️</div>Tidak ada pesanan di filter ini.</div></td></tr>`; return; }
     body.innerHTML=rows.map((o)=>`<tr>
       <td><div class="cell-strong">${esc(o.customer_name)}</div><div class="cell-sub">${o.customer_phone?esc(o.customer_phone):"—"}</div></td>
       <td><span class="mono">${esc(o.order_no||("#"+String(o.id).slice(0,8).toUpperCase()))}</span></td>
@@ -348,6 +373,7 @@
     openModal(`
       <div class="modal-head"><b>${esc(o.order_no||"Detail Pesanan")}</b><button class="x" onclick="closeModal()">✕</button></div>
       <div class="modal-body">
+        <button class="btn btn-line" style="width:100%;justify-content:center;margin-bottom:14px" onclick="printReceipt('${o.id}')">🧾 Cetak Struk</button>
         <div class="od-row"><span class="muted">Customer</span><b>${esc(o.customer_name)}</b></div>
         <div class="od-row"><span class="muted">No HP</span><span>${o.customer_phone?esc(o.customer_phone):"—"}</span></div>
         <div class="od-row"><span class="muted">Alamat</span><span style="max-width:60%;text-align:right">${esc(o.customer_address)}</span></div>
@@ -366,23 +392,82 @@
   };
   window.setOrder=async(id,status)=>{ try{ await api("/api/orders/admin/"+id,{method:"PATCH",body:JSON.stringify({status})}); closeModal(); toast("Status diperbarui"); loadOrders(); }catch(e){ toast(e.message,true); } };
 
-  // export
+  // ====== CETAK STRUK ======
+  window.printReceipt=async(id)=>{
+    const o=allOrders.find((x)=>x.id===id); if(!o) return;
+    let store={name:"Kaheins Sweetbaked"}, contact={};
+    try{ store=(await api("/api/settings/store")).data.value||store; }catch(_){}
+    try{ contact=(await api("/api/settings/contact")).data.value||{}; }catch(_){}
+    const items=o.items||[];
+    const totalQty=items.reduce((s,i)=>s+(i.qty||0),0);
+    const rp=(n)=>"Rp "+Number(n||0).toLocaleString("id-ID");
+    const itemsHtml=items.map((i,n)=>`
+      <div class="it"><b>${n+1}. ${esc(i.product_name)}</b></div>
+      <div class="it row"><span>${i.qty} x ${Number(i.unit_price).toLocaleString("id-ID")}</span><span>${rp(i.line_total)}</span></div>`).join("");
+    const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Struk ${esc(o.order_no||"")}</title>
+      <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Courier New',monospace;color:#111;padding:14px;width:300px;margin:0 auto;font-size:12px}
+        .c{text-align:center}.b{font-weight:700}
+        .logo{font-size:30px;margin-bottom:4px}
+        h2{font-size:16px;margin:2px 0}
+        .sub{font-size:11px;line-height:1.35}
+        .sep{border-top:1px dashed #000;margin:8px 0}
+        .row{display:flex;justify-content:space-between;gap:8px}
+        .it{padding:1px 0}
+        .tot{font-size:15px;font-weight:700}
+        .thanks{border:1.5px solid #000;padding:6px;margin-top:10px;text-align:center;font-weight:700}
+        @media print{body{width:auto}}
+      </style></head><body>
+      <div class="c">
+        <div class="logo">🍪</div>
+        <h2 class="b">${esc(store.name||"Kaheins Sweetbaked")}</h2>
+        <div class="sub">${esc(contact.address||"")}</div>
+        ${contact.whatsapp?`<div class="sub">No. Telp ${esc(contact.whatsapp)}</div>`:""}
+      </div>
+      <div class="sep"></div>
+      <div class="row"><span>${new Date(o.created_at).toLocaleDateString("id-ID")}</span><span>${esc(o.customer_name)}</span></div>
+      <div class="row"><span>${new Date(o.created_at).toLocaleTimeString("id-ID")}</span><span>${esc((o.customer_address||"").slice(0,22))}</span></div>
+      <div class="row"><span>No. ${esc(o.order_no||String(o.id).slice(0,8))}</span><span>${o.is_preorder?"PREORDER":""}</span></div>
+      <div class="sep"></div>
+      ${itemsHtml}
+      <div class="sep"></div>
+      <div class="row"><span>Total QTY</span><span>: ${totalQty}</span></div>
+      <div style="height:6px"></div>
+      <div class="row"><span>Sub Total</span><span>${rp(o.subtotal)}</span></div>
+      ${o.discount>0?`<div class="row"><span>Diskon ${esc(o.voucher_code||"")}</span><span>- ${rp(o.discount)}</span></div>`:""}
+      <div class="row tot"><span>Total</span><span>${rp(o.total)}</span></div>
+      <div class="row"><span>Status</span><span>${STATUS_LABEL[o.status]||o.status}</span></div>
+      <div class="thanks">Terima Kasih Telah Berbelanja<br/>${esc(store.name||"Kaheins Sweetbaked")}</div>
+      ${contact.instagram?`<div class="c sub" style="margin-top:8px">${esc(contact.instagram)}</div>`:""}
+      <script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script>
+      </body></html>`;
+    const w=window.open("","_blank","width=380,height=680");
+    if(!w){ toast("Popup diblokir browser. Izinkan popup dulu.",true); return; }
+    w.document.write(html); w.document.close(); w.focus();
+  };
+
+  // export (ikut filter tanggal + pencarian yang sedang aktif)
+  function visibleOrders(){
+    const q=orderSearch.trim().toLowerCase();
+    return allOrders.filter((o)=>passDate(o) && (!q||(o.customer_name||"").toLowerCase().includes(q)||(o.order_no||"").toLowerCase().includes(q)));
+  }
   const fmtItems=(o)=>(o.items||[]).map((i)=>`${i.product_name} x${i.qty}`).join("; ");
   const stamp=()=>new Date().toISOString().slice(0,10);
   function exportExcel(){
-    if(!allOrders.length) return;
-    const rows=allOrders.map((o)=>({Tanggal:new Date(o.created_at).toLocaleString("id-ID"),"No Pesanan":o.order_no||o.id,
+    const src=visibleOrders(); if(!src.length){ toast("Tidak ada data untuk diekspor",true); return; }
+    const rows=src.map((o)=>({Tanggal:new Date(o.created_at).toLocaleString("id-ID"),"No Pesanan":o.order_no||o.id,
       Nama:o.customer_name,"No HP":o.customer_phone||"-",Alamat:o.customer_address,Item:fmtItems(o),Voucher:o.voucher_code||"-",
       Subtotal:o.subtotal,Diskon:o.discount,Total:o.total,Status:STATUS_LABEL[o.status]||o.status}));
     const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Pesanan");
     XLSX.writeFile(wb,`kaheins-pesanan-${stamp()}.xlsx`);
   }
   function exportPdf(){
-    if(!allOrders.length) return;
+    const src=visibleOrders(); if(!src.length){ toast("Tidak ada data untuk diekspor",true); return; }
     const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:"landscape"});
     doc.setFontSize(14);doc.text("Kaheins Sweetbaked — Data Pesanan",14,14);
     doc.autoTable({head:[["Tanggal","No Pesanan","Nama","No HP","Item","Total","Status"]],
-      body:allOrders.map((o)=>[new Date(o.created_at).toLocaleString("id-ID"),o.order_no||o.id,o.customer_name,o.customer_phone||"-",fmtItems(o),rupiah(o.total),STATUS_LABEL[o.status]||o.status]),
+      body:src.map((o)=>[new Date(o.created_at).toLocaleString("id-ID"),o.order_no||o.id,o.customer_name,o.customer_phone||"-",fmtItems(o),rupiah(o.total),STATUS_LABEL[o.status]||o.status]),
       startY:22,styles:{fontSize:8,cellPadding:2,overflow:"linebreak"},headStyles:{fillColor:[255,78,155]},columnStyles:{4:{cellWidth:70}}});
     doc.save(`kaheins-pesanan-${stamp()}.pdf`);
   }

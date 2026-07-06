@@ -1169,7 +1169,8 @@
         .slide { aspect-ratio: 2 / 1; }
         .slide .slide-txt { max-width: 85%; }
         .slide h3 { font-size: 1.1rem; }
-        .carousel-nav { display: none; }
+        .carousel-nav { width: 32px; height: 32px; font-size: 0.95rem; }
+        .carousel-nav.prev { left: 6px; } .carousel-nav.next { right: 6px; }
       }
 
       /* ===== PROMO GRID ===== */
@@ -1686,6 +1687,17 @@
         document.getElementById("carPrev").addEventListener("click", () => go(idx - 1));
         document.getElementById("carNext").addEventListener("click", () => go(idx + 1));
         go(0);
+
+        // swipe di HP (geser kiri/kanan ganti banner)
+        if (total > 1) {
+          const car = document.getElementById("carousel");
+          let startX = 0, dx = 0;
+          car.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; dx = 0; }, { passive: true });
+          car.addEventListener("touchmove", (e) => { dx = e.touches[0].clientX - startX; }, { passive: true });
+          car.addEventListener("touchend", () => {
+            if (Math.abs(dx) > 40) go(dx < 0 ? idx + 1 : idx - 1);
+          });
+        }
 
         // auto-slide tiap 4.5 detik (berhenti kalau cuma 1 banner)
         if (total > 1) {
