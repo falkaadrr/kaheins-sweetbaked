@@ -89,7 +89,7 @@
         font-size: 1.35rem;
       }
       .logo .badge {
-        background: var(--pink);
+        background: #fff;
         border: var(--border);
         box-shadow: var(--shadow-sm);
         width: 42px;
@@ -98,6 +98,13 @@
         place-items: center;
         font-size: 1.3rem;
         transform: rotate(-6deg);
+        overflow: hidden;
+      }
+      .logo .badge img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 3px;
       }
       .nav-links {
         display: flex;
@@ -260,9 +267,9 @@
         overflow: hidden;
       }
       .cookie-stack img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        width: 82%;
+        height: 82%;
+        object-fit: contain;
       }
       .sticker {
         position: absolute;
@@ -1228,7 +1235,7 @@
     <nav>
       <div class="nav-in">
         <a href="#top" class="logo"
-          ><span class="badge">🍪</span>Kaheins Sweetbaked<span
+          ><span class="badge"><img src="images/logo.png" alt="Kaheins" /></span>Kaheins Sweetbaked<span
             style="color: var(--pink)"
           ></span
         ></a>
@@ -1269,8 +1276,8 @@
           <div class="hero-art">
             <div class="cookie-stack">
               <img
-                src="images/cookies.jpg"
-                alt="Kaheins Cookies"
+                src="images/logo.png"
+                alt="Kaheins Sweetbaked"
                 onerror="handleImgError(this, '🍪')"
               />
             </div>
