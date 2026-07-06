@@ -9,6 +9,7 @@ import authRouter, { ensureAdminSeed } from "./routes/auth.js";
 import productsRouter from "./routes/products.js";
 import ordersRouter from "./routes/orders.js";
 import vouchersRouter from "./routes/vouchers.js";
+import uploadsRouter from "./routes/uploads.js";
 import { categoriesRouter, bannersRouter, promosRouter, galleryRouter } from "./routes/cms.js";
 import { testimonialsRouter, reviewsRouter } from "./routes/testimonials.js";
 import {
@@ -35,6 +36,7 @@ app.use("/api/banners", bannersRouter);
 app.use("/api/promos", promosRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/vouchers", vouchersRouter);
+app.use("/api/uploads", uploadsRouter);
 app.use("/api/testimonials", testimonialsRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/gallery", galleryRouter);

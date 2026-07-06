@@ -369,14 +369,18 @@
         overflow: hidden;
       }
       .card .thumb img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        display: block;
       }
       .card .price-chip {
         position: absolute;
         top: 10px;
         right: 10px;
+        z-index: 2;
         background: #fff;
         border: var(--border);
         box-shadow: var(--shadow-sm);
@@ -1126,6 +1130,96 @@
           transition: none;
         }
       }
+      /* ===== BANNER CAROUSEL ===== */
+      .banner-sec { padding: 22px 0 4px; }
+      .carousel {
+        position: relative; border: var(--border); box-shadow: var(--shadow);
+        background: var(--blue-soft); overflow: hidden; border-radius: 2px;
+      }
+      .carousel-track { display: flex; transition: transform 0.5s ease; }
+      .slide {
+        min-width: 100%; position: relative; aspect-ratio: 3.2 / 1;
+        display: flex; align-items: center; overflow: hidden;
+      }
+      .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .slide .slide-txt {
+        position: relative; z-index: 2; padding: 24px 28px; max-width: 65%;
+        background: linear-gradient(90deg, rgba(255,255,255,0.92), rgba(255,255,255,0.4) 80%, transparent);
+        height: 100%; display: flex; flex-direction: column; justify-content: center;
+      }
+      .slide h3 { font-size: 1.5rem; line-height: 1.05; margin-bottom: 6px; }
+      .slide p { font-weight: 600; font-size: 0.92rem; }
+      .slide.no-img .slide-txt { background: none; max-width: 100%; }
+      .carousel-dots {
+        position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+        display: flex; gap: 7px; z-index: 3;
+      }
+      .carousel-dots button {
+        width: 11px; height: 11px; border: 2px solid var(--ink); background: #fff;
+        border-radius: 50%; padding: 0; cursor: pointer;
+      }
+      .carousel-dots button.on { background: var(--pink); }
+      .carousel-nav {
+        position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+        width: 38px; height: 38px; border: var(--border); background: #fff;
+        box-shadow: var(--shadow-sm); font-weight: 900; font-size: 1.1rem; cursor: pointer;
+      }
+      .carousel-nav.prev { left: 10px; } .carousel-nav.next { right: 10px; }
+      @media (max-width: 640px) {
+        .slide { aspect-ratio: 2 / 1; }
+        .slide .slide-txt { max-width: 85%; }
+        .slide h3 { font-size: 1.1rem; }
+        .carousel-nav { display: none; }
+      }
+
+      /* ===== PROMO GRID ===== */
+      .promo-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 16px;
+      }
+      .promo-card {
+        border: var(--border); box-shadow: var(--shadow-sm); background: #fff;
+        overflow: hidden; display: flex; flex-direction: column;
+        transition: transform 0.08s, box-shadow 0.08s;
+      }
+      .promo-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
+      .promo-card .p-img { aspect-ratio: 16 / 9; background: var(--pink-soft); overflow: hidden; }
+      .promo-card .p-img img { width: 100%; height: 100%; object-fit: cover; }
+      .promo-card .p-body { padding: 14px 16px; }
+      .promo-card .p-badge {
+        display: inline-block; background: var(--pink); color: #fff; font-weight: 800;
+        font-size: 0.7rem; padding: 3px 10px; border: 2px solid var(--ink);
+        text-transform: uppercase; margin-bottom: 8px;
+      }
+      .promo-card h4 { font-size: 1.05rem; margin-bottom: 4px; }
+      .promo-card p { font-size: 0.85rem; font-weight: 500; color: #444; }
+
+      /* ===== PROMO POPUP ===== */
+      .promo-pop {
+        position: fixed; inset: 0; background: rgba(17, 17, 17, 0.55); z-index: 90;
+        display: none; place-items: center; padding: 20px;
+      }
+      .promo-pop.show { display: grid; }
+      .promo-pop-card {
+        background: #fff; border: var(--border); box-shadow: var(--shadow-lg);
+        width: min(420px, 100%); max-height: 88vh; overflow: auto; position: relative;
+      }
+      .promo-pop-card .pp-close {
+        position: absolute; top: 10px; right: 10px; z-index: 2; width: 36px; height: 36px;
+        border: var(--border); background: #fff; box-shadow: var(--shadow-sm);
+        font-weight: 900; font-size: 1rem; cursor: pointer;
+      }
+      .promo-pop-card .pp-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-bottom: var(--border); display: block; }
+      .promo-pop-card .pp-body { padding: 20px 22px 24px; }
+      .promo-pop-card .p-badge {
+        display: inline-block; background: var(--pink); color: #fff; font-weight: 800;
+        font-size: 0.72rem; padding: 3px 11px; border: 2px solid var(--ink);
+        text-transform: uppercase; margin-bottom: 10px;
+      }
+      .promo-pop-card h3 { font-size: 1.35rem; margin-bottom: 8px; }
+      .promo-pop-card p { font-weight: 500; color: #333; margin-bottom: 6px; }
+      .pp-extra { margin-top: 14px; padding-top: 14px; border-top: 2px dashed var(--ink); }
+      .pp-extra .pp-mini { font-size: 0.86rem; font-weight: 600; padding: 4px 0; }
     </style>
   </head>
   <body>
@@ -1192,6 +1286,31 @@
         </span>
       </div>
     </header>
+
+    <!-- BANNER CAROUSEL (auto dari /api/banners) -->
+    <section class="sec banner-sec" id="bannerSec" style="display: none">
+      <div class="wrap">
+        <div class="carousel" id="carousel">
+          <div class="carousel-track" id="carouselTrack"></div>
+          <button class="carousel-nav prev" id="carPrev" aria-label="Sebelumnya">‹</button>
+          <button class="carousel-nav next" id="carNext" aria-label="Berikutnya">›</button>
+          <div class="carousel-dots" id="carouselDots"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROMO GRID (auto dari /api/promos) -->
+    <section class="sec" id="promoSec" style="display: none">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="tag"><i data-feather="gift"></i> Promo</span>
+            <h2>Promo Spesial</h2>
+          </div>
+        </div>
+        <div class="promo-grid" id="promoGrid"></div>
+      </div>
+    </section>
 
     <!-- PRODUCTS -->
     <section class="sec" id="produk">
@@ -1514,6 +1633,141 @@
         renderProducts();
       }
       loadProducts();
+
+      // ====== BANNER CAROUSEL ======
+      async function loadBanners() {
+        let banners = [];
+        try {
+          const res = await fetch(BACKEND_URL + "/api/banners");
+          banners = (await res.json()).data || [];
+        } catch (e) {
+          banners = [];
+        }
+        if (!banners.length) return; // section tetap hidden
+        const sec = document.getElementById("bannerSec");
+        const track = document.getElementById("carouselTrack");
+        const dots = document.getElementById("carouselDots");
+        sec.style.display = "block";
+
+        track.innerHTML = banners
+          .map((b) => {
+            const img = b.image_url
+              ? `<img src="${b.image_url}" alt="${b.title || "banner"}" onerror="this.style.display='none'" />`
+              : "";
+            const inner = `
+              <div class="slide-txt">
+                ${b.title ? `<h3>${b.title}</h3>` : ""}
+                ${b.subtitle ? `<p>${b.subtitle}</p>` : ""}
+              </div>`;
+            const slide = `<div class="slide ${b.image_url ? "" : "no-img"}">${img}${inner}</div>`;
+            return b.link_url
+              ? `<a href="${b.link_url}" target="_blank" rel="noopener" style="min-width:100%;text-decoration:none;color:inherit">${slide}</a>`
+              : slide;
+          })
+          .join("");
+
+        let idx = 0;
+        const total = banners.length;
+        const go = (i) => {
+          idx = (i + total) % total;
+          track.style.transform = `translateX(-${idx * 100}%)`;
+          dots.querySelectorAll("button").forEach((d, k) => d.classList.toggle("on", k === idx));
+        };
+        dots.innerHTML = banners.map((_, k) => `<button aria-label="slide ${k + 1}"></button>`).join("");
+        dots.querySelectorAll("button").forEach((d, k) => d.addEventListener("click", () => go(k)));
+        document.getElementById("carPrev").addEventListener("click", () => go(idx - 1));
+        document.getElementById("carNext").addEventListener("click", () => go(idx + 1));
+        go(0);
+
+        // auto-slide tiap 4.5 detik (berhenti kalau cuma 1 banner)
+        if (total > 1) {
+          let timer = setInterval(() => go(idx + 1), 4500);
+          const car = document.getElementById("carousel");
+          car.addEventListener("mouseenter", () => clearInterval(timer));
+          car.addEventListener("mouseleave", () => (timer = setInterval(() => go(idx + 1), 4500)));
+        }
+        if (window.feather) feather.replace();
+      }
+      loadBanners();
+
+      // ====== PROMO (grid + popup) ======
+      const promoCardHtml = (p) => {
+        const img = p.image_url
+          ? `<div class="p-img"><img src="${p.image_url}" alt="${p.title}" onerror="this.parentElement.style.display='none'" /></div>`
+          : "";
+        return `
+          ${img}
+          <div class="p-body">
+            ${p.badge ? `<span class="p-badge">${p.badge}</span>` : ""}
+            <h4>${p.title}</h4>
+            ${p.description ? `<p>${p.description}</p>` : ""}
+          </div>`;
+      };
+
+      async function loadPromos() {
+        let promos = [];
+        try {
+          const res = await fetch(BACKEND_URL + "/api/promos");
+          promos = (await res.json()).data || [];
+        } catch (e) {
+          promos = [];
+        }
+        if (!promos.length) return;
+
+        // 1) Grid sebelum daftar produk
+        const sec = document.getElementById("promoSec");
+        const grid = document.getElementById("promoGrid");
+        sec.style.display = "block";
+        grid.innerHTML = promos.map((p) => `<div class="promo-card">${promoCardHtml(p)}</div>`).join("");
+        if (window.feather) feather.replace();
+
+        // 2) Popup (sekali per sesi) — tampil promo pertama + list sisanya
+        showPromoPopup(promos);
+      }
+
+      function showPromoPopup(promos) {
+        try {
+          if (sessionStorage.getItem("kaheins_promo_seen")) return;
+        } catch (e) {}
+        const pop = document.getElementById("promoPop");
+        const content = document.getElementById("promoPopContent");
+        const main = promos[0];
+        const rest = promos.slice(1);
+        const img = main.image_url
+          ? `<img class="pp-img" src="${main.image_url}" alt="${main.title}" onerror="this.style.display='none'" />`
+          : "";
+        content.innerHTML = `
+          ${img}
+          <div class="pp-body">
+            ${main.badge ? `<span class="p-badge">${main.badge}</span>` : ""}
+            <h3>${main.title}</h3>
+            ${main.description ? `<p>${main.description}</p>` : ""}
+            ${
+              rest.length
+                ? `<div class="pp-extra">${rest
+                    .map((p) => `<div class="pp-mini">🎁 <b>${p.title}</b>${p.description ? " — " + p.description : ""}</div>`)
+                    .join("")}</div>`
+                : ""
+            }
+          </div>`;
+        pop.classList.add("show");
+        try {
+          sessionStorage.setItem("kaheins_promo_seen", "1");
+        } catch (e) {}
+      }
+
+      (function initPromoPopup() {
+        const pop = document.getElementById("promoPop");
+        const close = () => pop.classList.remove("show");
+        document.getElementById("promoPopClose").addEventListener("click", close);
+        pop.addEventListener("click", (e) => {
+          if (e.target === pop) close();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") close();
+        });
+      })();
+      loadPromos();
 
       // ====== CART LOGIC ======
       const cartBody = document.getElementById("cartBody");
@@ -1917,5 +2171,12 @@
       renderCart();
       if (window.feather) feather.replace();
     </script>
+    <!-- PROMO POPUP (muncul sekali per sesi) -->
+    <div class="promo-pop" id="promoPop">
+      <div class="promo-pop-card" id="promoPopCard">
+        <button class="pp-close" id="promoPopClose" aria-label="Tutup">✕</button>
+        <div id="promoPopContent"></div>
+      </div>
+    </div>
   </body>
 </html>

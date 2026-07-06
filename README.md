@@ -36,7 +36,8 @@ kaheins-sweetbaked/
 1. Buat project di [supabase.com](https://supabase.com).
 2. **SQL Editor** → tempel `schema.sql` → **Run**.
 3. **Storage** → buat 2 bucket **Private**: `bukti-bayar` dan `media`.
-4. **Project Settings → API** → catat `Project URL` + `service_role` key.
+4. **Storage** → buat 1 bucket **Public** bernama `uploads` (buat gambar produk/banner/promo yang diupload dari admin).
+5. **Project Settings → API** → catat `Project URL` + `service_role` key.
 
 ## Jalankan lokal
 

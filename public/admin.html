@@ -152,6 +152,15 @@
   .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:90;display:none;place-items:center;padding:24px;cursor:zoom-out}
   .lightbox.show{display:grid} .lightbox img{max-width:100%;max-height:92vh;border-radius:10px}
 
+
+  .img-field{display:flex;flex-direction:column;gap:8px}
+  .img-prev{width:100%;height:150px;border:1.5px dashed var(--line);border-radius:10px;display:grid;place-items:center;overflow:hidden;background:#FAFBFD;color:var(--muted);font-size:.82rem}
+  .img-prev img{width:100%;height:100%;object-fit:cover}
+  .img-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--pink);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;font-size:.85rem;cursor:pointer;width:fit-content}
+  .img-btn:hover{background:var(--pink-dark)}
+  .img-clear{background:none;border:1px solid var(--line);border-radius:9px;padding:6px 12px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;width:fit-content}
+  .img-clear:hover{border-color:var(--red);color:var(--red)}
+
   @media(max-width:820px){
     .layout{grid-template-columns:1fr}
     .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;overflow-x:auto}
@@ -199,7 +208,7 @@
         <div class="topbar">
           <div class="t-title">Content Management System</div>
           <div class="profile">
-            <div class="who" style="text-align:right"><b id="waName">Khaira</b><span id="waRole">Admin</span></div>
+            <div class="who" style="text-align:right"><b id="waName">Admin</b><span id="waRole">Admin Markom</span></div>
             <div class="av" id="waAvatar">A</div>
           </div>
         </div>
@@ -389,7 +398,7 @@
       fields:[{k:"name",label:"Nama produk",type:"text",full:true,required:true},
         {k:"category_id",label:"Kategori",type:"catselect"},{k:"price",label:"Harga (Rp)",type:"number",required:true},
         {k:"emoji",label:"Emoji",type:"text"},{k:"stock",label:"Stok (kosong = ∞)",type:"number"},
-        {k:"image_url",label:"URL gambar",type:"text",full:true},{k:"description",label:"Deskripsi",type:"textarea",full:true},
+        {k:"image_url",label:"Gambar",type:"image",full:true},{k:"description",label:"Deskripsi",type:"textarea",full:true},
         {k:"sort_order",label:"Urutan",type:"number"},{k:"is_preorder",label:"Preorder",type:"checkbox"},
         {k:"featured",label:"Unggulan",type:"checkbox"},{k:"active",label:"Aktif",type:"checkbox",default:true}]},
     categories:{title:"Kategori",section:"Katalog",listUrl:"/api/categories/admin",base:"/api/categories",idKey:"id",
@@ -402,14 +411,14 @@
         ["Link",(b)=>b.link_url?`<span class="muted">${esc(b.link_url)}</span>`:"—"],
         ["Status",(b)=>`<span class="pill ${b.active!==false?"p-on":"p-off"}">${b.active!==false?"Aktif":"Nonaktif"}</span>`]],
       fields:[{k:"title",label:"Judul",type:"text"},{k:"subtitle",label:"Subjudul",type:"text"},
-        {k:"image_url",label:"URL gambar",type:"text",full:true},{k:"link_url",label:"URL link",type:"text",full:true},
+        {k:"image_url",label:"Gambar",type:"image",full:true},{k:"link_url",label:"URL link",type:"text",full:true},
         {k:"sort_order",label:"Urutan",type:"number"},{k:"active",label:"Aktif",type:"checkbox",default:true}]},
     promos:{title:"Promo",section:"Konten",listUrl:"/api/promos/admin",base:"/api/promos",idKey:"id",
       cols:[["Judul",(p)=>`<div class="cell-strong">${esc(p.title)}</div><div class="cell-sub">${esc(p.description||"")}</div>`],
         ["Badge",(p)=>p.badge?`<span class="pill p-processing">${esc(p.badge)}</span>`:"—"],
         ["Status",(p)=>`<span class="pill ${p.active!==false?"p-on":"p-off"}">${p.active!==false?"Aktif":"Nonaktif"}</span>`]],
       fields:[{k:"title",label:"Judul",type:"text",required:true},{k:"badge",label:"Badge",type:"text"},
-        {k:"image_url",label:"URL gambar",type:"text",full:true},{k:"description",label:"Deskripsi",type:"textarea",full:true},
+        {k:"image_url",label:"Gambar",type:"image",full:true},{k:"description",label:"Deskripsi",type:"textarea",full:true},
         {k:"active",label:"Aktif",type:"checkbox",default:true}]},
     vouchers:{title:"Voucher",section:"Promosi",listUrl:"/api/vouchers",base:"/api/vouchers",idKey:"code",
       cols:[["Kode",(v)=>`<span class="mono cell-strong">${esc(v.code)}</span>`],
@@ -464,8 +473,30 @@
     if(f.type==="checkbox") return `<div class="chk"><input type="checkbox" id="f_${f.k}" ${val?"checked":""}/><span>${f.label}</span></div>`;
     if(f.type==="select") return `<select id="f_${f.k}">${f.options.map(([ov,ol])=>`<option value="${ov}" ${ov===v?"selected":""}>${ol}</option>`).join("")}</select>`;
     if(f.type==="catselect") return `<select id="f_${f.k}"><option value="">— pilih —</option>${categoriesCache.map((c)=>`<option value="${c.id}" ${c.id===v?"selected":""}>${esc(c.name)}</option>`).join("")}</select>`;
+    if(f.type==="image") return `
+      <div class="img-field">
+        <div class="img-prev" id="prev_${f.k}">${v?`<img src="${esc(v)}"/>`:'<span>Belum ada gambar</span>'}</div>
+        <label class="img-btn"><span id="upl_${f.k}">📷 Pilih Gambar</span>
+          <input type="file" accept="image/*" onchange="uploadImg('${f.k}',this)" hidden/></label>
+        ${v?`<button type="button" class="img-clear" onclick="clearImg('${f.k}')">Hapus</button>`:""}
+        <input type="hidden" id="f_${f.k}" value="${esc(v)}"/>
+      </div>`;
     return `<input type="${f.type==="number"?"number":"text"}" id="f_${f.k}" value="${esc(v)}"/>`;
   }
+  window.uploadImg=async(key,input)=>{
+    const file=input.files&&input.files[0]; if(!file) return;
+    const lbl=$("upl_"+key), prev=$("prev_"+key), hidden=$("f_"+key);
+    const old=lbl.textContent; lbl.textContent="Mengunggah...";
+    try{
+      const fd=new FormData(); fd.append("image",file);
+      const res=await fetch(API+"/api/uploads/image",{method:"POST",headers:{Authorization:"Bearer "+token},body:fd});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error||"Upload gagal.");
+      hidden.value=data.url; prev.innerHTML=`<img src="${data.url}"/>`; toast("Gambar terupload");
+    }catch(e){ toast(e.message,true); }
+    finally{ lbl.textContent=old; input.value=""; }
+  };
+  window.clearImg=(key)=>{ const h=$("f_"+key),p=$("prev_"+key); if(h)h.value=""; if(p)p.innerHTML='<span>Belum ada gambar</span>'; };
   window.openResourceForm=(key,id)=>{
     const R=RES[key]; const it=id!=null?curItems.find((x)=>String(x[R.idKey])===String(id)):null;
     openModal(`
