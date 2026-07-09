@@ -11,7 +11,7 @@ router.post("/check", wrap(async (req, res) => {
   const v = await getActiveVoucher(code);
   if (!v) throw new ValidationError("Kode voucher tidak valid.");
   const discount = computeDiscount(v, Number(subtotal) || 0);
-  res.json({ code: v.code, type: v.type, value: v.value, min_order: v.min_order, label: v.label, discount });
+  res.json({ code: v.code, type: v.type, value: v.value, min_order: v.min_order, max_discount: v.max_discount, label: v.label, discount });
 }));
 router.get("/", requireAuth, wrap(async (_req, res) => {
   const { data, error } = await supabase.from("vouchers").select("*").order("created_at", { ascending: false });

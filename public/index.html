@@ -1823,10 +1823,13 @@
           updateVoucherMsg();
           return 0;
         }
-        const d =
+        let d =
           appliedVoucher.type === "percent"
             ? Math.round((subtotal * appliedVoucher.value) / 100)
             : appliedVoucher.value;
+        // batasi maksimal potongan kalau di-set
+        if (appliedVoucher.maxDiscount && appliedVoucher.maxDiscount > 0)
+          d = Math.min(d, appliedVoucher.maxDiscount);
         return Math.min(d, subtotal); // diskon nggak boleh lebih besar dari subtotal
       }
 
@@ -1948,6 +1951,7 @@
                 type: data.type,
                 value: data.value,
                 minOrder: data.min_order,
+                maxDiscount: data.max_discount || null,
                 label: data.label || "Voucher",
               };
               voucherMsg.textContent = `✅ ${appliedVoucher.label} dipakai!`;

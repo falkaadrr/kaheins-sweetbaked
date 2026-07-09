@@ -64,7 +64,7 @@ router.post("/vouchers/check", wrap(async (req, res) => {
   const v = await getActiveVoucher(code);
   if (!v) throw new ValidationError("Kode voucher tidak valid.");
   const discount = computeDiscount(v, Number(subtotal) || 0);
-  res.json({ code: v.code, type: v.type, value: v.value, min_order: v.min_order, label: v.label, discount });
+  res.json({ code: v.code, type: v.type, value: v.value, min_order: v.min_order, max_discount: v.max_discount, label: v.label, discount });
 }));
 
 // POST /api/orders/:id/proof (publik)
