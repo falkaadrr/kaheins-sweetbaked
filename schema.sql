@@ -49,7 +49,7 @@ create table if not exists customers (
 
 create table if not exists vouchers (
   code text primary key, type text not null check (type in ('percent','fixed')),
-  value integer not null, min_order integer not null default 0, label text,
+  value integer not null, min_order integer not null default 0, max_discount integer, label text,
   active boolean not null default true, created_at timestamptz not null default now());
 
 create table if not exists banners (

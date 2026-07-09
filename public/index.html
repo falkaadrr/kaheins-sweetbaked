@@ -1555,6 +1555,7 @@
       </div>
     </div>
 
+    <script src="config.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
       // ====== KONFIGURASI ======
@@ -1565,7 +1566,7 @@
       // server (Railway) yang SAMA — jadi cukup panggil "/api/..." relatif.
       // (Kalau suatu saat frontend dipisah ke domain lain, isi URL lengkap
       // backend di sini, misal "https://xxx.up.railway.app".)
-      const BACKEND_URL = "";
+      const BACKEND_URL = (window.BACKEND_URL || "");
 
       // Order yang baru dibuat di server: { id, total } | null
       let currentOrder = null;

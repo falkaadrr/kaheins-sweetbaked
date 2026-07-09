@@ -227,8 +227,9 @@
   <div class="lightbox" id="lightbox"><img id="lightboxImg" alt="bukti" /></div>
   <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
 <script>
-  const API=""; const TK="kaheins_jwt";
+  const API=(window.BACKEND_URL||""); const TK="kaheins_jwt";
   let token=localStorage.getItem(TK)||""; let me=null;
   let categoriesCache=[]; let activeView="orders";
 
@@ -509,9 +510,11 @@
       cols:[["Kode",(v)=>`<span class="mono cell-strong">${esc(v.code)}</span>`],
         ["Potongan",(v)=>v.type==="percent"?v.value+"%":rupiah(v.value)],
         ["Min. Belanja",(v)=>rupiah(v.min_order)],
+        ["Maks Potongan",(v)=>v.max_discount?rupiah(v.max_discount):'<span class="muted">—</span>'],
         ["Status",(v)=>`<span class="pill ${v.active!==false?"p-on":"p-off"}">${v.active!==false?"Aktif":"Nonaktif"}</span>`]],
       fields:[{k:"code",label:"Kode",type:"text",required:true},{k:"type",label:"Tipe",type:"select",options:[["percent","Persen (%)"],["fixed","Potongan (Rp)"]]},
         {k:"value",label:"Nilai",type:"number",required:true},{k:"min_order",label:"Min. belanja",type:"number"},
+        {k:"max_discount",label:"Maks Potongan (Rp, kosong = tanpa batas)",type:"number",full:true},
         {k:"label",label:"Label",type:"text",full:true},{k:"active",label:"Aktif",type:"checkbox",default:true}]},
   };
 

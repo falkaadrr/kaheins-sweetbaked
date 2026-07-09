@@ -28,6 +28,7 @@ router.post("/", requireAuth, wrap(async (req, res) => {
   if (b.type === "percent" && value > 100) throw new ValidationError("Persen maksimal 100.");
   const { data, error } = await supabase.from("vouchers").insert({
     code, type: b.type, value: Math.round(value), min_order: Math.round(Number(b.min_order) || 0),
+    max_discount: b.max_discount ? Math.round(Number(b.max_discount)) : null,
     label: b.label ? String(b.label).trim() : null, active: b.active === false ? false : true,
   }).select().single();
   if (error) throw error;
@@ -39,6 +40,7 @@ router.patch("/:code", requireAuth, wrap(async (req, res) => {
   if (b.type !== undefined) { if (!["percent", "fixed"].includes(b.type)) throw new ValidationError("Tipe harus percent / fixed."); patch.type = b.type; }
   if (b.value !== undefined) { const v = Number(b.value); if (!Number.isFinite(v) || v <= 0) throw new ValidationError("Nilai harus > 0."); patch.value = Math.round(v); }
   if (b.min_order !== undefined) patch.min_order = Math.round(Number(b.min_order) || 0);
+  if (b.max_discount !== undefined) patch.max_discount = (b.max_discount === "" || b.max_discount === null) ? null : Math.round(Number(b.max_discount));
   if (b.label !== undefined) patch.label = b.label ? String(b.label).trim() : null;
   if (b.active !== undefined) patch.active = !!b.active;
   if (Object.keys(patch).length === 0) throw new ValidationError("Tidak ada perubahan.");
