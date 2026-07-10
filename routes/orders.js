@@ -108,4 +108,58 @@ router.patch("/admin/:id", requireAuth, wrap(async (req, res) => {
   res.json({ data });
 }));
 
+// POST /api/orders/admin/manual (admin) — input order offline / walk-in di kasir
+router.post("/admin/manual", requireAuth, wrap(async (req, res) => {
+  const { customer, items, voucher_code, is_preorder, note } = req.body || {};
+  const name = String(customer?.name || "").trim();
+  if (!name) throw new ValidationError("Nama pembeli wajib diisi.");
+  const phone = String(customer?.phone || "").trim();
+  // Alamat opsional untuk order offline — default penanda pembelian langsung di toko
+  const address = String(customer?.address || "").trim() || "Pembelian di toko (offline)";
+
+  const allowedStatus = ["pending", "paid", "done"];
+  const status = allowedStatus.includes(req.body?.status) ? req.body.status : "paid";
+
+  const lines = await buildLineItems(items);
+  const subtotal = calcSubtotal(lines);
+  let voucher = null;
+  if (voucher_code) { voucher = await getActiveVoucher(voucher_code); if (!voucher) throw new ValidationError("Kode voucher tidak valid."); }
+  const discount = computeDiscount(voucher, subtotal);
+  const total = subtotal - discount;
+  const customerId = await upsertCustomer({ name, phone, address, total });
+
+  const { data: order, error } = await supabase.from("orders").insert({
+    order_no: genOrderNo(), customer_id: customerId, customer_name: name,
+    customer_phone: phone || null, customer_address: address, is_preorder: !!is_preorder,
+    voucher_code: voucher ? voucher.code : null, subtotal, discount, total, status,
+    note: note ? String(note).trim() : null,
+  }).select().single();
+  if (error) throw error;
+
+  const { error: itemErr } = await supabase.from("order_items").insert(lines.map((l) => ({ ...l, order_id: order.id })));
+  if (itemErr) throw itemErr;
+  await notify("order", "Order manual dibuat", `${name} — Rp ${total.toLocaleString("id-ID")} (${status})`);
+  res.status(201).json({ order_id: order.id, order_no: order.order_no, subtotal, discount, total, status });
+}));
+
+// POST /api/orders/admin/:id/proof (admin) — upload bukti bayar atas nama customer
+// (mis. customer kirim bukti via WhatsApp lalu admin unggah di CMS)
+router.post("/admin/:id/proof", requireAuth, upload.single("proof"), wrap(async (req, res) => {
+  const orderId = req.params.id;
+  if (!req.file) throw new ValidationError("Bukti pembayaran wajib diunggah.");
+  const { data: order } = await supabase.from("orders").select("id, status").eq("id", orderId).maybeSingle();
+  if (!order) throw new ValidationError("Order tidak ditemukan.");
+  const ext = (req.file.originalname.split(".").pop() || "jpg").toLowerCase();
+  const objectPath = `${orderId}/${Date.now()}.${ext}`;
+  const { error: upErr } = await supabase.storage.from(PROOF_BUCKET).upload(objectPath, req.file.buffer, { contentType: req.file.mimetype, upsert: false });
+  if (upErr) throw upErr;
+  // Default: sekaligus tandai Lunas. Kirim mark_paid=false untuk hanya menyimpan bukti tanpa ubah status.
+  const markPaid = String(req.body?.mark_paid ?? "true") !== "false";
+  const patch = { proof_path: objectPath, updated_at: new Date().toISOString() };
+  if (markPaid) patch.status = "paid";
+  await supabase.from("orders").update(patch).eq("id", orderId);
+  const url = await signedUrl(objectPath);
+  res.json({ ok: true, proof_url: url, status: patch.status || order.status });
+}));
+
 export default router;

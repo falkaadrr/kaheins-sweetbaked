@@ -148,6 +148,15 @@
   .status-set{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
   .status-set button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-weight:600;font-size:.82rem}
   .status-set button:hover{border-color:var(--pink);color:var(--pink-dark)}
+  .mo-list{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+  .mo-prod{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .mo-prod:last-child{border-bottom:none}
+  .mo-pinfo{display:flex;align-items:center;gap:10px;min-width:0}
+  .mo-emoji{font-size:1.3rem}
+  .mo-qty{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .mo-qty button{width:30px;height:30px;border:1.5px solid var(--line);background:#fff;border-radius:8px;font-size:1.1rem;font-weight:700;line-height:1;cursor:pointer}
+  .mo-qty button:hover{border-color:var(--pink);color:var(--pink-dark)}
+  .mo-qty span{min-width:22px;text-align:center;font-weight:700}
 
   .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:90;display:none;place-items:center;padding:24px;cursor:zoom-out}
   .lightbox.show{display:grid} .lightbox img{max-width:100%;max-height:92vh;border-radius:10px}
@@ -304,6 +313,7 @@
             </select>
             <button class="btn btn-soft" id="btnExcel">⬇ Excel</button>
             <button class="btn btn-soft" id="btnPdf">⬇ PDF</button>
+            <button class="btn btn-primary" id="btnManual">🧾 Order Manual</button>
           </div>
         </div>
         <div class="date-bar">
@@ -326,6 +336,7 @@
     $("ordDateClear").addEventListener("click",()=>{orderFrom="";orderTo="";$("ordFrom").value="";$("ordTo").value="";renderOrderRows();});
     $("btnExcel").addEventListener("click",exportExcel);
     $("btnPdf").addEventListener("click",exportPdf);
+    $("btnManual").addEventListener("click",openManualOrder);
     loadOrders();
   }
   // ambil tanggal lokal (YYYY-MM-DD) dari created_at
@@ -345,9 +356,10 @@
     }catch(e){ toast(e.message,true); }
   }
   function renderStats(){
+    const el=$("stats"); if(!el) return; // guard: view bisa sudah berganti saat async selesai
     const cek=allOrders.filter((o)=>o.status==="waiting_confirmation").length;
     const omzet=allOrders.filter((o)=>["paid","processing","shipped","done"].includes(o.status)).reduce((s,o)=>s+o.total,0);
-    $("stats").innerHTML=`
+    el.innerHTML=`
       <div class="stat a"><div class="ic">🧾</div><div class="lbl">Total Pesanan</div><div class="val">${allOrders.length}</div></div>
       <div class="stat b"><div class="ic">🔔</div><div class="lbl">Perlu Dicek</div><div class="val">${cek}</div></div>
       <div class="stat c"><div class="ic">💰</div><div class="lbl">Omzet Terbayar</div><div class="val" style="font-size:1.15rem">${rupiah(omzet)}</div></div>`;
@@ -356,7 +368,7 @@
     const q=orderSearch.trim().toLowerCase();
     const rows=allOrders.filter((o)=>passDate(o) && (!q||(o.customer_name||"").toLowerCase().includes(q)||(o.order_no||"").toLowerCase().includes(q)));
     const cnt=$("ordCount"); if(cnt) cnt.textContent=`${rows.length} pesanan`;
-    const body=$("ordBody");
+    const body=$("ordBody"); if(!body) return; // guard: view sudah berganti
     if(!rows.length){ body.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="big">🗒️</div>Tidak ada pesanan di filter ini.</div></td></tr>`; return; }
     body.innerHTML=rows.map((o)=>`<tr>
       <td><div class="cell-strong">${esc(o.customer_name)}</div><div class="cell-sub">${o.customer_phone?esc(o.customer_phone):"—"}</div></td>
@@ -385,6 +397,11 @@
         ${o.discount>0?`<div class="od-row"><span class="muted">Diskon ${esc(o.voucher_code||"")}</span><span class="mono">- ${rupiah(o.discount)}</span></div>`:""}
         <div class="od-row" style="border:none"><b>Total</b><b class="mono">${rupiah(o.total)}</b></div>
         <p class="muted" style="font-size:.82rem;margin:14px 0 6px">Bukti pembayaran</p>${proof}
+        <label class="btn btn-line" style="width:100%;justify-content:center;margin-top:8px;cursor:pointer">
+          <span id="upBtn_${o.id}">📤 ${o.proof_url?"Ganti":"Upload"} Bukti (dari WhatsApp)</span>
+          <input type="file" accept="image/*" hidden onchange="adminUploadProof('${o.id}',this)"/>
+        </label>
+        <label class="chk" style="margin-top:8px"><input type="checkbox" id="markPaid_${o.id}" checked/><span>Sekaligus tandai <b>Lunas</b> setelah upload</span></label>
         <p class="muted" style="font-size:.82rem;margin:16px 0 6px">Ubah status</p>
         <div class="status-set">
           ${["paid","processing","shipped","done","cancelled"].map((s)=>`<button onclick="setOrder('${o.id}','${s}')">${STATUS_LABEL[s]}</button>`).join("")}
@@ -392,6 +409,96 @@
       </div>`);
   };
   window.setOrder=async(id,status)=>{ try{ await api("/api/orders/admin/"+id,{method:"PATCH",body:JSON.stringify({status})}); closeModal(); toast("Status diperbarui"); loadOrders(); }catch(e){ toast(e.message,true); } };
+
+  // ====== UPLOAD BUKTI OLEH ADMIN (mis. customer kirim via WhatsApp) ======
+  window.adminUploadProof=async(id,input)=>{
+    const file=input.files&&input.files[0]; if(!file) return;
+    const lbl=$("upBtn_"+id); const old=lbl?lbl.textContent:"";
+    if(lbl) lbl.textContent="Mengunggah...";
+    const markPaid=(($("markPaid_"+id)||{}).checked)!==false;
+    try{
+      const fd=new FormData(); fd.append("proof",file); fd.append("mark_paid",markPaid?"true":"false");
+      const res=await fetch(API+"/api/orders/admin/"+id+"/proof",{method:"POST",headers:{Authorization:"Bearer "+token},body:fd});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error||"Upload gagal.");
+      toast("Bukti tersimpan"); closeModal(); await loadOrders();
+      if(allOrders.find((x)=>x.id===id)) orderDetail(id); // buka lagi dengan bukti terbaru
+    }catch(e){ toast(e.message,true); if(lbl) lbl.textContent=old; }
+    finally{ input.value=""; }
+  };
+
+  // ====== ORDER MANUAL / OFFLINE (kasir) ======
+  let manualProducts=[]; let manualCart={};
+  async function openManualOrder(){
+    try{ manualProducts=(await api("/api/products")).data||[]; }
+    catch(e){ toast(e.message,true); return; }
+    manualCart={}; renderManualModal();
+  }
+  function manualLines(){ return manualProducts.filter((p)=>manualCart[p.id]>0).map((p)=>({p,qty:manualCart[p.id]})); }
+  function manualSubtotal(){ return manualLines().reduce((s,l)=>s+l.p.price*l.qty,0); }
+  function renderManualModal(){
+    const prodRows=manualProducts.map((p)=>{
+      const qty=manualCart[p.id]||0;
+      return `<div class="mo-prod">
+        <div class="mo-pinfo"><span class="mo-emoji">${p.emoji||"🍪"}</span>
+          <div><div class="cell-strong">${esc(p.name)}</div><div class="cell-sub">${rupiah(p.price)}${p.stock!=null?` · stok ${p.stock}`:""}</div></div></div>
+        <div class="mo-qty">
+          <button type="button" onclick="manualQty('${p.id}',-1)">−</button>
+          <span id="moq_${p.id}">${qty}</span>
+          <button type="button" onclick="manualQty('${p.id}',1)">+</button>
+        </div></div>`;
+    }).join("");
+    openModal(`
+      <div class="modal-head"><b>🧾 Order Manual / Offline</b><button class="x" onclick="closeModal()">✕</button></div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="full"><label>Nama pembeli *</label><input id="mo_name" placeholder="Nama customer"/></div>
+          <div><label>No HP (opsional)</label><input id="mo_phone" placeholder="08xxx"/></div>
+          <div><label>Status</label><select id="mo_status">
+            <option value="paid" selected>Lunas (bayar di tempat)</option>
+            <option value="done">Selesai</option>
+            <option value="pending">Menunggu Pembayaran</option>
+          </select></div>
+          <div class="full"><label>Alamat (opsional — kosong = beli di toko)</label><input id="mo_address" placeholder="Pembelian di toko (offline)"/></div>
+        </div>
+        <p class="muted" style="font-size:.82rem;margin:14px 0 6px">Pilih produk</p>
+        <div class="mo-list">${prodRows||'<div class="muted">Belum ada produk aktif.</div>'}</div>
+        <div class="form-grid" style="margin-top:12px">
+          <div><label>Kode voucher (opsional)</label><input id="mo_voucher" placeholder="mis. KAHEINS10"/></div>
+          <div class="full"><label>Catatan (opsional)</label><input id="mo_note" placeholder="Catatan order"/></div>
+        </div>
+        <div class="od-row" style="margin-top:12px;border:none"><b>Subtotal</b><b class="mono" id="mo_sub">${rupiah(manualSubtotal())}</b></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-soft" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="submitManualOrder()">Simpan Order</button>
+      </div>`);
+  }
+  window.manualQty=(id,delta)=>{
+    const p=manualProducts.find((x)=>x.id===id); if(!p) return;
+    let q=(manualCart[id]||0)+Number(delta); if(q<0)q=0;
+    if(p.stock!=null && q>p.stock){ toast(`Stok "${p.name}" tinggal ${p.stock}`,true); q=p.stock; }
+    manualCart[id]=q;
+    const el=$("moq_"+id); if(el) el.textContent=q;
+    const sub=$("mo_sub"); if(sub) sub.textContent=rupiah(manualSubtotal());
+  };
+  window.submitManualOrder=async()=>{
+    const name=($("mo_name").value||"").trim();
+    if(!name){ toast("Nama pembeli wajib diisi",true); return; }
+    const items=manualLines().map((l)=>({id:l.p.id,qty:l.qty}));
+    if(!items.length){ toast("Pilih minimal 1 produk",true); return; }
+    const body={
+      customer:{name,phone:($("mo_phone").value||"").trim(),address:($("mo_address").value||"").trim()},
+      items, status:$("mo_status").value,
+      voucher_code:($("mo_voucher").value||"").trim()||null,
+      note:($("mo_note").value||"").trim()||null,
+    };
+    try{
+      const r=await api("/api/orders/admin/manual",{method:"POST",body:JSON.stringify(body)});
+      closeModal(); toast("Order tersimpan: "+r.order_no); await loadOrders();
+      if(confirm("Order tersimpan. Cetak struk sekarang?")) printReceipt(r.order_id);
+    }catch(e){ toast(e.message,true); }
+  };
 
   // ====== CETAK STRUK ======
   window.printReceipt=async(id)=>{
@@ -544,7 +651,7 @@
   function renderResRows(key,q){
     const R=RES[key]; q=(q||"").trim().toLowerCase();
     const rows=curItems.filter((it)=>!q||JSON.stringify(it).toLowerCase().includes(q));
-    const body=$("resBody");
+    const body=$("resBody"); if(!body) return; // guard: view sudah berganti
     if(!rows.length){ body.innerHTML=`<tr><td colspan="${R.cols.length+1}"><div class="empty"><div class="big">📭</div>Belum ada ${R.title.toLowerCase()}.</div></td></tr>`; return; }
     body.innerHTML=rows.map((it)=>{
       const id=it[R.idKey];
@@ -624,7 +731,7 @@
           <tbody id="tBody"></tbody></table></div></div>`;
     try{
       const items=(await api("/api/testimonials/admin")).data||[];
-      const body=$("tBody");
+      const body=$("tBody"); if(!body) return; // guard: view sudah berganti
       body.innerHTML=items.length?items.map((t)=>`<tr>
         <td class="cell-strong">${esc(t.name)}</td>
         <td>${"★".repeat(t.rating)}<span class="muted">${"★".repeat(5-t.rating)}</span></td>
