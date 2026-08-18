@@ -2165,7 +2165,14 @@
           uploadText.textContent = "Mengunggah bukti...";
           try {
             await uploadProofToServer(file);
-            uploadText.textContent = "Bukti tersimpan ✓ — ganti?";
+            uploadText.textContent = "Bukti tersimpan ✓";
+            // Order sudah tersimpan & bukti sudah terupload -> checkout beneran
+            // selesai di titik ini (tombol WA di bawah cuma opsional buat
+            // notif admin). Reset + reload sekarang biar cart nggak nyangkut
+            // dan nggak ke-checkout dobel kalau customer nggak klik WA.
+            showToast("Bukti pembayaran tersimpan! 🎉", "check-circle");
+            resetAfterOrder();
+            setTimeout(() => window.location.reload(), 1200);
           } catch (e) {
             uploadText.textContent = "Ganti Bukti Pembayaran";
             showToast("Bukti gagal diunggah ke server", "alert-triangle");
