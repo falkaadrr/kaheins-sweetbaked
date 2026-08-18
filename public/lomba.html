@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Lomba Hias Cookies — Kaheins Sweetbaked</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --white: #ffffff; --pink: #ff5ba3; --pink-soft: #ffd6e8;
+        --blue: #2d5bff; --blue-soft: #cfe0ff; --ink: #111111;
+        --shadow: 6px 6px 0 var(--ink);
+        --shadow-sm: 4px 4px 0 var(--ink);
+        --shadow-lg: 9px 9px 0 var(--ink);
+        --border: 3px solid var(--ink);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: "Space Grotesk", sans-serif; color: var(--ink);
+        background: var(--white);
+        background-image: radial-gradient(var(--pink-soft) 1.4px, transparent 1.4px);
+        background-size: 26px 26px;
+        min-height: 100vh; line-height: 1.5; padding: 20px;
+      }
+      .wrap { max-width: 640px; margin: 0 auto; }
+      h1, h2, .display { font-family: "Archivo Black", sans-serif; letter-spacing: -0.5px; line-height: 1.05; }
+
+      /* Header */
+      .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+      .logo { display: inline-flex; align-items: center; gap: 8px; font-family: "Archivo Black", sans-serif; font-size: 1rem; text-decoration: none; color: var(--ink); }
+      .logo .b { width: 34px; height: 34px; display: grid; place-items: center; background: var(--pink); border: var(--border); box-shadow: var(--shadow-sm); font-size: 1.1rem; }
+      .back { font-weight: 700; font-size: .85rem; text-decoration: none; color: var(--blue); border: var(--border); background: var(--white); box-shadow: var(--shadow-sm); padding: 8px 12px; }
+      .back:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
+
+      /* Hero */
+      .hero { background: var(--pink); border: var(--border); box-shadow: var(--shadow-lg); padding: 30px 26px; margin-bottom: 24px; position: relative; }
+      .hero .sticker { position: absolute; top: -16px; right: -12px; background: var(--blue); color: #fff; border: var(--border); box-shadow: var(--shadow-sm); font-family: "Archivo Black", sans-serif; font-size: .72rem; padding: 7px 11px; transform: rotate(6deg); }
+      .hero h1 { color: #fff; font-size: clamp(1.8rem, 6vw, 2.6rem); text-transform: uppercase; text-shadow: 3px 3px 0 var(--ink); margin-bottom: 12px; }
+      .hero p { color: #fff; font-weight: 600; max-width: 42ch; }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+      .chip { background: #fff; border: var(--border); box-shadow: var(--shadow-sm); font-weight: 700; font-size: .8rem; padding: 6px 10px; }
+
+      /* Card + fields */
+      .card { background: var(--white); border: var(--border); box-shadow: var(--shadow); padding: 24px 22px; margin-bottom: 20px; }
+      .card h2 { font-size: 1.05rem; text-transform: uppercase; margin-bottom: 4px; }
+      .card .hint { font-size: .85rem; color: #555; margin-bottom: 18px; }
+      .field { margin-bottom: 16px; }
+      label { display: block; font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+      label .req { color: var(--pink); }
+      input[type="text"], input[type="tel"], input[type="email"] {
+        width: 100%; font-family: inherit; font-size: 1rem; padding: 12px 14px;
+        border: var(--border); background: var(--white); box-shadow: var(--shadow-sm); outline: none;
+      }
+      input:focus { box-shadow: var(--shadow); }
+
+      /* Payment */
+      .pay-row { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+      .qris { flex: 0 0 auto; width: 150px; border: var(--border); box-shadow: var(--shadow-sm); background: #fff; padding: 8px; }
+      .qris img { width: 100%; display: block; }
+      .pay-info { flex: 1 1 200px; min-width: 200px; }
+      .fee { display: inline-block; background: var(--blue-soft); border: var(--border); box-shadow: var(--shadow-sm); font-family: "Archivo Black", sans-serif; font-size: 1.25rem; padding: 8px 14px; margin-bottom: 12px; }
+      .pay-info ul { list-style: none; font-size: .9rem; }
+      .pay-info li { padding: 3px 0; }
+
+      /* Upload */
+      .drop { border: 3px dashed var(--ink); background: var(--pink-soft); padding: 22px; text-align: center; cursor: pointer; transition: background .1s; }
+      .drop:hover { background: #ffc2de; }
+      .drop.has { border-style: solid; background: #fff; box-shadow: var(--shadow-sm); }
+      .drop input { display: none; }
+      .drop .ph { font-weight: 700; }
+      .drop .ph small { display: block; font-weight: 400; color: #555; margin-top: 4px; }
+      .drop img { max-width: 100%; max-height: 220px; border: var(--border); margin: 0 auto; display: block; }
+      .up-msg { font-size: .85rem; font-weight: 700; margin-top: 10px; min-height: 18px; }
+
+      /* Submit */
+      .submit { width: 100%; font-family: "Archivo Black", sans-serif; font-size: 1.15rem; letter-spacing: .3px; color: #fff; background: var(--pink); border: var(--border); box-shadow: var(--shadow); padding: 18px; cursor: pointer; transition: transform .08s, box-shadow .08s; }
+      .submit:hover:not(:disabled) { transform: translate(-3px,-3px); box-shadow: var(--shadow-lg); }
+      .submit:disabled { opacity: .55; cursor: not-allowed; }
+
+      /* Success */
+      .success { display: none; text-align: center; background: var(--white); border: var(--border); box-shadow: var(--shadow-lg); padding: 40px 26px; }
+      .success.show { display: block; }
+      .success .ico { width: 88px; height: 88px; margin: 0 auto 20px; display: grid; place-items: center; background: var(--blue-soft); border: var(--border); box-shadow: var(--shadow); font-size: 2.6rem; transform: rotate(-6deg); }
+      .success h2 { font-size: 1.6rem; text-transform: uppercase; margin-bottom: 12px; }
+      .regno { display: inline-block; font-family: "Archivo Black", sans-serif; background: var(--pink-soft); border: var(--border); box-shadow: var(--shadow-sm); padding: 10px 16px; margin: 8px 0 18px; font-size: 1.05rem; word-break: break-all; }
+      .success p { color: #444; max-width: 40ch; margin: 0 auto 20px; }
+      .wa-btn { display: inline-block; text-decoration: none; font-weight: 700; color: #fff; background: #25d366; border: var(--border); box-shadow: var(--shadow-sm); padding: 13px 20px; }
+      .wa-btn:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
+
+      .foot { text-align: center; font-size: .82rem; color: #666; padding: 8px 0 20px; }
+      @media (max-width: 460px) { .qris { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <a class="logo" href="/"><span class="b">🍪</span>Kaheins Sweetbaked</a>
+        <a class="back" href="/">← Toko</a>
+      </div>
+
+      <!-- ====== FORM (default) ====== -->
+      <div id="formView">
+        <section class="hero">
+          <span class="sticker">DAFTAR SEKARANG</span>
+          <h1>Lomba Hias Cookies</h1>
+          <p id="lombaDesc">
+            Tunjukin kreativitasmu menghias cookies ala Kaheins! Terbuka untuk umum,
+            individu. Isi data di bawah, bayar biaya pendaftaran, lalu unggah bukti transfernya.
+          </p>
+          <div class="chips">
+            <span class="chip" id="chipDeadline">🗓️ Deadline: — (isi)</span>
+            <span class="chip" id="chipPrize">🏆 Hadiah menarik</span>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Data Peserta</h2>
+          <p class="hint">Pastikan No. WhatsApp & email aktif — info lomba dikirim ke sana.</p>
+          <div class="field">
+            <label>Nama Lengkap <span class="req">*</span></label>
+            <input type="text" id="fName" placeholder="Nama kamu" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label>No. WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="fWa" placeholder="08xxxxxxxxxx" autocomplete="tel" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" id="fEmail" placeholder="email@contoh.com" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label>Domisili / Kota <span class="req">*</span></label>
+            <input type="text" id="fCity" placeholder="mis. Tangerang Selatan" />
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Pembayaran</h2>
+          <p class="hint">Transfer biaya pendaftaran, lalu unggah bukti transfernya di bawah.</p>
+          <div class="pay-row">
+            <div class="qris"><img src="/images/qris.png" alt="QRIS Kaheins" onerror="this.parentNode.style.display='none'" /></div>
+            <div class="pay-info">
+              <span class="fee" id="feeLabel">Rp 50.000</span>
+              <ul id="payInfo">
+                <li>Scan QRIS di samping, atau</li>
+                <li>Transfer ke: <b>BCA 1234567890</b> a.n. Kaheins</li>
+                <li>Nominal: <b>biaya pendaftaran</b></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:18px">
+            <label>Unggah Bukti Pembayaran <span class="req">*</span></label>
+            <div class="drop" id="drop">
+              <input type="file" id="fProof" accept="image/*" />
+              <div class="ph" id="dropPh">📎 Ketuk untuk pilih gambar<small>JPG / PNG, maks 4MB</small></div>
+              <img id="proofImg" style="display:none" alt="Preview bukti" />
+            </div>
+            <div class="up-msg" id="upMsg"></div>
+          </div>
+        </section>
+
+        <button class="submit" id="submitBtn">Kirim Pendaftaran</button>
+      </div>
+
+      <!-- ====== SUCCESS ====== -->
+      <section class="success" id="successView">
+        <div class="ico">🎉</div>
+        <h2>Pendaftaran Berhasil!</h2>
+        <p>Nomor pendaftaranmu — simpan baik-baik ya:</p>
+        <div class="regno" id="regNoOut">—</div>
+        <p>Bukti bayar kamu lagi kami verifikasi. Info selanjutnya dikirim via WhatsApp/email. Ada pertanyaan? Chat kami:</p>
+        <a class="wa-btn" id="waBtn" href="#" target="_blank" rel="noopener">💬 Hubungi Panitia</a>
+      </section>
+
+      <p class="foot">© Kaheins Sweetbaked · Lomba Hias Cookies</p>
+    </div>
+
+    <script>
+      // ====== KONFIG — silakan sesuaikan ======
+      const BACKEND_URL = window.BACKEND_URL || ""; // sama domain, biarkan kosong
+      const WA_PANITIA = "6283848531389";           // no. WA panitia
+      const BIAYA_LABEL = "Rp 50.000";              // tampilan biaya
+      const DEADLINE = "";                           // mis. "20 Agustus 2026" (kosongkan kalau belum)
+      // Terapkan konfig ke tampilan
+      document.getElementById("feeLabel").textContent = BIAYA_LABEL;
+      if (DEADLINE) document.getElementById("chipDeadline").textContent = "🗓️ Deadline: " + DEADLINE;
+
+      const $ = (id) => document.getElementById(id);
+      const drop = $("drop"), fProof = $("fProof"), proofImg = $("proofImg"),
+            dropPh = $("dropPh"), upMsg = $("upMsg"), submitBtn = $("submitBtn");
+      let proofBlob = null;
+
+      drop.addEventListener("click", () => fProof.click());
+
+      // Kompres gambar di browser biar aman < 4MB & upload ngebut
+      function compressImage(file) {
+        return new Promise((resolve, reject) => {
+          const img = new Image(), reader = new FileReader();
+          reader.onload = () => (img.src = reader.result);
+          reader.onerror = reject; img.onerror = reject;
+          img.onload = () => {
+            const MAX = 1600; let w = img.width, h = img.height;
+            if (w > h && w > MAX) { h = Math.round((h * MAX) / w); w = MAX; }
+            else if (h >= w && h > MAX) { w = Math.round((w * MAX) / h); h = MAX; }
+            const c = document.createElement("canvas");
+            c.width = w; c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            c.toBlob((b) => resolve(b), "image/jpeg", 0.82);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      fProof.addEventListener("change", async () => {
+        const file = fProof.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) { upMsg.textContent = "File harus gambar ya."; upMsg.style.color = "#d40000"; return; }
+        upMsg.textContent = "Menyiapkan gambar..."; upMsg.style.color = "#555";
+        try {
+          proofBlob = await compressImage(file);
+          proofImg.src = URL.createObjectURL(proofBlob);
+          proofImg.style.display = "block";
+          dropPh.style.display = "none";
+          drop.classList.add("has");
+          upMsg.textContent = "Bukti siap ✅"; upMsg.style.color = "#0a8a55";
+        } catch (e) {
+          upMsg.textContent = "Gagal baca gambar, coba lain ya."; upMsg.style.color = "#d40000";
+        }
+      });
+
+      const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+
+      submitBtn.addEventListener("click", async () => {
+        const name = $("fName").value.trim();
+        const wa = $("fWa").value.trim();
+        const email = $("fEmail").value.trim();
+        const city = $("fCity").value.trim();
+
+        if (!name) return flag($("fName"), "Nama wajib diisi.");
+        if (wa.replace(/\D/g, "").length < 8) return flag($("fWa"), "No. WhatsApp tidak valid.");
+        if (!isEmail(email)) return flag($("fEmail"), "Email tidak valid.");
+        if (!city) return flag($("fCity"), "Domisili/kota wajib diisi.");
+        if (!proofBlob) { upMsg.textContent = "Unggah bukti bayar dulu ya."; upMsg.style.color = "#d40000"; return; }
+
+        const fd = new FormData();
+        fd.append("name", name);
+        fd.append("whatsapp", wa);
+        fd.append("email", email);
+        fd.append("city", city);
+        fd.append("proof", proofBlob, "bukti.jpg");
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Mengirim...";
+        try {
+          const res = await fetch(BACKEND_URL + "/api/lomba/register", { method: "POST", body: fd });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data.ok === false) throw new Error(data.error || "Gagal mendaftar");
+          // Sukses
+          $("regNoOut").textContent = data.reg_no || "-";
+          $("waBtn").href = "https://wa.me/" + WA_PANITIA +
+            "?text=" + encodeURIComponent("Halo Panitia Lomba Hias Cookies! Aku baru daftar, no. pendaftaran: " + (data.reg_no || ""));
+          $("formView").style.display = "none";
+          $("successView").classList.add("show");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (e) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Kirim Pendaftaran";
+          upMsg.textContent = e.message + " — coba lagi ya."; upMsg.style.color = "#d40000";
+        }
+      });
+
+      function flag(el, msg) {
+        el.focus();
+        upMsg.textContent = msg; upMsg.style.color = "#d40000";
+        el.style.boxShadow = "4px 4px 0 #d40000";
+        setTimeout(() => (el.style.boxShadow = ""), 1500);
+      }
+    </script>
+  </body>
+</html>

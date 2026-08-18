@@ -1,0 +1,83 @@
+# Kaheins Sweetbaked — CMS + POS v2.1 🍪
+
+Toko cookies + dashboard **gaya POS** dalam satu service (Express) dengan database
+**Supabase (Postgres + Storage)**. Deploy ke Vercel (serverless); toko & dashboard
+jalan dari domain yang sama. Storage Supabase gratis tanpa perlu kartu kredit.
+
+## Alur pemesanan
+
+buka web → lihat produk → keranjang → voucher (opsional) → form nama/alamat/HP →
+transfer QRIS → **upload bukti → langsung masuk database**. Tombol WhatsApp opsional
+(langsung buka chat admin, tanpa cari kontak).
+
+## Modul
+
+CRUD via dashboard: **Produk, Kategori, Banner, Promo, Voucher, Testimoni**. Plus
+API: **Order** (nomor `KHS/YYYYMMDD/XXXX`, QRIS + bukti), **Customer** (otomatis),
+Settings, Homepage CMS, Gallery, Media, Notifications, Audit log. Login admin **JWT**.
+
+## Struktur
+
+```
+kaheins-sweetbaked/
+├── api/index.js          # entry serverless (Vercel)
+├── server.js             # entry dev lokal (npm run dev)
+├── app.js                # inti Express app (dipakai server.js & api/index.js)
+├── config/supabase.js    # koneksi Supabase
+├── middleware/           # auth (JWT), error
+├── lib/                  # helpers, crud factory, pricing
+├── routes/               # auth, products, orders, vouchers, cms, testimonials, misc
+├── schema.sql            # semua tabel + seed
+├── schema-lomba.sql      # tabel fitur lomba
+├── public/               # index.html (toko), admin.html (POS), lomba.html, images/
+├── vercel.json            # routing: statis di /public, sisanya ke api/index.js
+├── .env.example
+└── DEPLOY-VERCEL.md      # panduan deploy lengkap
+```
+
+## Setup Supabase
+
+1. Buat project di [supabase.com](https://supabase.com).
+2. **SQL Editor** → tempel `schema.sql` → **Run**.
+3. **Storage** → buat 2 bucket **Private**: `bukti-bayar` dan `media`.
+4. **Storage** → buat 1 bucket **Public** bernama `uploads` (buat gambar produk/banner/promo yang diupload dari admin).
+5. **Project Settings → API** → catat `Project URL` + `service_role` key.
+
+## Jalankan lokal
+
+```bash
+cp .env.example .env      # isi nilainya
+npm install
+npm run dev
+```
+Toko: `http://localhost:3000/` · Admin: `http://localhost:3000/admin.html`
+(login pakai ADMIN_EMAIL/PASSWORD — akun admin dibuat otomatis saat start).
+
+## Variabel .env
+
+| Variable | Wajib | Keterangan |
+|---|---|---|
+| `SUPABASE_URL` | ✅ | URL project |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | service_role key (rahasia) |
+| `ADMIN_EMAIL` | ✅ | email login admin |
+| `ADMIN_PASSWORD` | ✅ | password login admin |
+| `JWT_SECRET` | ✅ | string acak untuk token |
+| `PROOF_BUCKET` | – | default `bukti-bayar` |
+| `MEDIA_BUCKET` | – | default `media` |
+| `UPLOAD_BUCKET` | – | default `uploads` (bucket publik gambar produk/banner/promo) |
+| `FRONTEND_ORIGIN` | – | default `*` |
+| `PORT` | – | default `3000` (dev lokal saja, tidak dipakai di Vercel) |
+
+## Deploy ke Vercel
+
+Lihat [DEPLOY-VERCEL.md](DEPLOY-VERCEL.md) untuk langkah lengkap (import project,
+isi Environment Variables, custom domain).
+
+## Catatan
+
+- Harga & voucher dihitung/divalidasi di server — frontend tak bisa memalsukan total.
+- Kalau sebelumnya sempat pakai Firebase: sekarang balik ke Supabase karena Firebase
+  Storage butuh upgrade Blaze (berbayar), sedangkan Supabase Storage gratis.
+- UI dashboard: Pesanan (POS), Produk, Kategori, Banner, Promo, Voucher, Testimoni.
+  Modul lain (media, homepage, settings, gallery, customers, notifications, audit)
+  API-nya sudah jalan, UI bisa ditambah menyusul.
