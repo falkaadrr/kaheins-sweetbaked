@@ -173,6 +173,54 @@
     .logo{width:100%}
     .form-grid{grid-template-columns:1fr}
   }
+  /* ---- Dashboard ---- */
+  .dash-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+  @media(max-width:900px){.dash-grid{grid-template-columns:1fr}}
+  .dash-chart{display:flex;align-items:flex-end;gap:6px;height:200px;padding:20px 18px 14px}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .bar-col .bar{width:100%;max-width:26px;background:var(--pink);border-radius:6px 6px 0 0;min-height:3px;transition:height .3s}
+  .bar-col span{font-size:.62rem;color:var(--muted)}
+  .dash-list{padding:6px}
+  .dash-li{display:flex;align-items:center;gap:12px;padding:11px 12px;border-bottom:1px solid var(--line)}
+  .dash-li:last-child{border-bottom:none}
+  .dash-li .rank{width:26px;height:26px;flex:none;display:grid;place-items:center;background:var(--pink-soft);color:var(--pink-dark);border-radius:8px;font-weight:800;font-size:.82rem}
+  .dash-li .grow{flex:1}.dash-li .grow b{display:block;font-size:.9rem}.dash-li .grow span{font-size:.76rem;color:var(--muted)}
+  .dash-li .amt{font-weight:700;font-size:.86rem}
+  .src{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:20px;border:1.5px solid;white-space:nowrap}
+  .src-online{color:var(--blue);border-color:#B2CCFF;background:#EFF4FF}
+  .src-pos{color:#B5540C;border-color:#F5C99B;background:#FFF4E8}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+  /* ---- Kasir / POS ---- */
+  .pos-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start}
+  @media(max-width:900px){.pos-grid{grid-template-columns:1fr}}
+  .pos-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;padding:16px;max-height:62vh;overflow-y:auto}
+  .pos-p{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:14px 10px;text-align:center;cursor:pointer;transition:.1s}
+  .pos-p:hover{border-color:var(--pink);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+  .pos-p-emoji{font-size:1.8rem}.pos-p-name{font-size:.82rem;font-weight:700;margin:6px 0 2px;line-height:1.2}.pos-p-price{font-size:.78rem;color:var(--pink-dark);font-weight:700}
+  .pos-cart-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+  .pos-items{display:flex;flex-direction:column;gap:8px;max-height:34vh;overflow-y:auto}
+  .pos-it{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .pos-it .grow{flex:1;min-width:0}.pos-it .grow b{display:block;font-size:.85rem}.pos-it .grow span{font-size:.74rem;color:var(--muted)}
+  .pos-it .qty{display:flex;align-items:center;gap:8px}
+  .pos-it .qty button{width:26px;height:26px;border:1px solid var(--line);border-radius:7px;background:#fff;font-weight:800;font-size:1rem;line-height:1;cursor:pointer}
+  .pos-it .qty button:hover{border-color:var(--pink);color:var(--pink-dark)}
+  .pos-it .lt{font-weight:700;font-size:.82rem;min-width:66px;text-align:right}
+  .pos-form{display:flex;flex-direction:column;gap:4px}
+  .pos-form label{font-size:.78rem;font-weight:700;margin-top:6px}
+  .pos-input{border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;font-size:.88rem;outline:none;font-family:inherit;width:100%}
+  .pos-input:focus{border-color:var(--pink)}
+  .pos-summary{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+  .pos-summary .row{display:flex;justify-content:space-between;font-size:.88rem}
+  .pos-summary .row.total{font-weight:800;font-size:1.05rem;border-top:1px solid var(--line);padding-top:8px;margin-top:2px}
+  .pos-pay{border-top:1px dashed var(--line);padding-top:12px;margin-top:2px;display:flex;flex-direction:column;gap:4px}
+  .pos-methods{display:flex;gap:8px;margin-bottom:6px}
+  .pm{flex:1;border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:10px 6px;font-weight:700;font-size:.82rem;cursor:pointer;transition:.1s}
+  .pm:hover{border-color:var(--pink)}
+  .pm.active{background:var(--pink);color:#fff;border-color:var(--pink)}
+  .pos-quick{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .qc{border:1.5px solid var(--line);border-radius:8px;background:#fff;padding:7px 11px;font-weight:700;font-size:.8rem;cursor:pointer}
+  .qc:hover{border-color:var(--pink);color:var(--pink-dark)}
+  .pos-change{display:flex;justify-content:space-between;font-weight:800;font-size:1.05rem;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -198,7 +246,9 @@
       <aside class="sidebar">
         <div class="logo"><span class="mark">🍪</span> Kaheins CMS</div>
         <nav class="nav" id="nav">
-          <button data-v="orders" class="active"><span class="ic">🧾</span> Pesanan <span class="badge" id="navBadge" style="display:none">0</span></button>
+          <button data-v="dashboard" class="active"><span class="ic">📊</span> Dashboard</button>
+          <button data-v="pos"><span class="ic">🧮</span> Kasir</button>
+          <button data-v="orders"><span class="ic">🧾</span> Pesanan <span class="badge" id="navBadge" style="display:none">0</span></button>
           <button data-v="products"><span class="ic">🍪</span> Produk</button>
           <button data-v="categories"><span class="ic">🗂️</span> Kategori</button>
           <button data-v="banners"><span class="ic">🖼️</span> Banner</button>
@@ -269,7 +319,7 @@
     $("loginScreen").style.display="none";$("app").style.display="block";
     if(me){ $("waName").textContent=me.name||"Admin"; $("waRole").textContent=me.email||"Administrator";
       $("waAvatar").textContent=(me.name||me.email||"A").slice(0,1).toUpperCase(); }
-    switchView("orders");
+    switchView("dashboard");
   }
   $("loginBtn").addEventListener("click",doLogin);
   $("password").addEventListener("keydown",(e)=>{if(e.key==="Enter")doLogin();});
@@ -279,7 +329,9 @@
   function switchView(v){
     activeView=v;
     document.querySelectorAll("#nav button").forEach((b)=>b.classList.toggle("active",b.dataset.v===v));
-    if(v==="orders") viewOrders();
+    if(v==="dashboard") viewDashboard();
+    else if(v==="pos") viewPOS();
+    else if(v==="orders") viewOrders();
     else if(v==="testimonials") viewTestimonials();
     else if(v==="lomba") viewLomba();
     else viewResource(v);
@@ -289,6 +341,214 @@
   function pageHead(title,crumb,section){
     return `<div class="page-head"><h2>${title}</h2>
       <div class="crumb"><span class="hl">🏪 Kaheins Sweetbaked</span> • ${section} • ${crumb}</div></div>`;
+  }
+
+  // ================= DASHBOARD =================
+  async function viewDashboard(){
+    page.innerHTML=pageHead("Dashboard","Ringkasan Penjualan","Penjualan")+`
+      <div class="stats" id="dashStats"></div>
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-head"><div class="h-ttl"><b>Tren Omzet</b><span>14 hari terakhir</span></div></div>
+          <div class="dash-chart" id="dashChart"><div class="empty" style="padding:30px"><div class="big">⏳</div>Memuat...</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="h-ttl"><b>Produk Terlaris</b><span>berdasarkan jumlah terjual</span></div></div>
+          <div class="dash-list" id="dashBest"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="panel-head"><div class="h-ttl"><b>Pesanan Terbaru</b><span>8 transaksi terakhir</span></div></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Pelanggan</th><th>No. Pesanan</th><th>Sumber</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="dashRecent"></tbody>
+        </table></div>
+      </div>`;
+    try{
+      const d=await api("/api/dashboard/summary");
+      if(activeView!=="dashboard") return;
+      renderDash(d);
+    }catch(e){ toast(e.message,true); }
+  }
+  function renderDash(d){
+    const s=$("dashStats"); if(!s) return;
+    s.innerHTML=`
+      <div class="stat a"><div class="ic">💰</div><div class="lbl">Omzet Bulan Ini</div><div class="val">${rupiah(d.omzetMonth)}</div></div>
+      <div class="stat b"><div class="ic">🧾</div><div class="lbl">Order Bulan Ini</div><div class="val">${d.ordersMonth}</div></div>
+      <div class="stat c"><div class="ic">☀️</div><div class="lbl">Omzet Hari Ini</div><div class="val">${rupiah(d.omzetToday)}</div></div>
+      <div class="stat a"><div class="ic">📦</div><div class="lbl">Rata-rata / Order</div><div class="val">${rupiah(d.avgOrder)}</div></div>`;
+    const chart=$("dashChart");
+    if(chart){
+      const max=Math.max(1,...d.trend.map((t)=>t.revenue));
+      chart.innerHTML=d.trend.map((t)=>{
+        const h=Math.round((t.revenue/max)*100); const dd=new Date(t.date);
+        return `<div class="bar-col" title="${dd.toLocaleDateString("id-ID",{day:"2-digit",month:"short"})}: ${rupiah(t.revenue)}"><div class="bar" style="height:${h}%"></div><span>${dd.getDate()}</span></div>`;
+      }).join("");
+    }
+    const best=$("dashBest");
+    if(best){
+      best.innerHTML=d.bestSellers.length? d.bestSellers.map((b,i)=>`
+        <div class="dash-li"><span class="rank">${i+1}</span><div class="grow"><b>${esc(b.name)}</b><span>${b.qty} terjual</span></div><span class="amt">${rupiah(b.revenue)}</span></div>`).join("")
+        : `<div class="empty" style="padding:26px"><div class="big">📭</div>Belum ada penjualan.</div>`;
+    }
+    const rec=$("dashRecent");
+    if(rec){
+      rec.innerHTML=d.recent.length? d.recent.map((o)=>`<tr>
+        <td>${esc(o.customer_name)}</td>
+        <td><span class="mono">${esc(o.order_no||"-")}</span></td>
+        <td><span class="src src-${o.source==="pos"?"pos":"online"}">${o.source==="pos"?"Kasir":"Online"}</span></td>
+        <td><b>${rupiah(o.total)}</b></td>
+        <td><span class="pill p-${o.status}">${STATUS_LABEL[o.status]||o.status}</span></td>
+      </tr>`).join("")
+        : `<tr><td colspan="5"><div class="empty"><div class="big">📭</div>Belum ada pesanan.</div></td></tr>`;
+    }
+  }
+
+  // ================= KASIR / POS =================
+  let posProducts=[]; let posCart={}; // id -> {product, qty}
+  async function viewPOS(){
+    page.innerHTML=pageHead("Kasir","Buat Pesanan","Penjualan")+`
+      <div class="pos-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="h-ttl"><b>Pilih Produk</b><span>klik produk untuk menambah</span></div>
+            <div class="search">🔍<input id="posSearch" placeholder="Cari produk"/></div>
+          </div>
+          <div class="pos-products" id="posProducts"><div class="empty" style="padding:30px"><div class="big">⏳</div>Memuat produk...</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="h-ttl"><b>Keranjang</b><span>transaksi baru • langsung Lunas</span></div></div>
+          <div class="pos-cart-body">
+            <div id="posItems" class="pos-items"></div>
+            <div class="pos-form">
+              <label>Nama pembeli <span class="muted">(opsional)</span></label>
+              <input id="posName" class="pos-input" placeholder="Pelanggan"/>
+              <label>No. HP <span class="muted">(opsional)</span></label>
+              <input id="posPhone" class="pos-input" placeholder="08..." inputmode="numeric"/>
+              <label>Diskon Rp <span class="muted">(opsional)</span></label>
+              <input id="posDiscount" class="pos-input" type="number" min="0" placeholder="0"/>
+              <label>Catatan <span class="muted">(opsional)</span></label>
+              <input id="posNote" class="pos-input" placeholder="mis. ambil di cabang"/>
+            </div>
+            <div class="pos-summary">
+              <div class="row"><span>Subtotal</span><span id="posSubtotal">Rp 0</span></div>
+              <div class="row"><span>Diskon</span><span id="posDiscView">Rp 0</span></div>
+              <div class="row total"><span>Total</span><span id="posTotal">Rp 0</span></div>
+            </div>
+            <div class="pos-pay">
+              <label>Metode bayar</label>
+              <div class="pos-methods" id="posMethods">
+                <button type="button" class="pm active" data-m="cash">💵 Cash</button>
+                <button type="button" class="pm" data-m="qris">📱 QRIS</button>
+                <button type="button" class="pm" data-m="transfer">🏦 Transfer</button>
+              </div>
+              <div id="posCashBox">
+                <label>Uang dibayar</label>
+                <input id="posPaid" class="pos-input" type="number" min="0" placeholder="0" inputmode="numeric"/>
+                <div class="pos-quick" id="posQuick"></div>
+                <div class="pos-change"><span>Kembalian</span><span id="posChange">Rp 0</span></div>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="posSave" style="width:100%;justify-content:center;padding:14px">💾 Simpan Pesanan (Lunas)</button>
+          </div>
+        </div>
+      </div>`;
+    $("posSearch").addEventListener("input",(e)=>renderPosProducts(e.target.value));
+    $("posDiscount").addEventListener("input",renderPosCart);
+    $("posPaid").addEventListener("input",renderPosChange);
+    posMethod="cash";
+    $("posMethods").querySelectorAll(".pm").forEach((b)=>b.addEventListener("click",()=>{
+      posMethod=b.getAttribute("data-m");
+      $("posMethods").querySelectorAll(".pm").forEach((x)=>x.classList.toggle("active",x===b));
+      $("posCashBox").style.display = posMethod==="cash" ? "block" : "none";
+      renderPosChange();
+    }));
+    $("posSave").addEventListener("click",savePos);
+    try{
+      const d=await api("/api/products");
+      if(activeView!=="pos") return;
+      posProducts=(d.data||d||[]).filter((p)=>p.active!==false);
+      posCart={}; renderPosProducts(""); renderPosCart();
+    }catch(e){ toast(e.message,true); }
+  }
+  function renderPosProducts(q){
+    const el=$("posProducts"); if(!el) return;
+    q=(q||"").trim().toLowerCase();
+    const list=posProducts.filter((p)=>!q||(p.name||"").toLowerCase().includes(q));
+    el.innerHTML=list.length? list.map((p)=>`
+      <button class="pos-p" onclick="posAdd('${p.id}')">
+        <div class="pos-p-emoji">${p.emoji||"🍪"}</div>
+        <div class="pos-p-name">${esc(p.name)}</div>
+        <div class="pos-p-price">${rupiah(p.price)}</div>
+      </button>`).join("")
+      : `<div class="empty" style="padding:30px"><div class="big">🔍</div>Produk tidak ketemu.</div>`;
+  }
+  window.posAdd=(id)=>{ const p=posProducts.find((x)=>x.id===id); if(!p) return; if(posCart[id]) posCart[id].qty++; else posCart[id]={product:p,qty:1}; renderPosCart(); };
+  window.posQty=(id,delta)=>{ if(!posCart[id]) return; posCart[id].qty+=delta; if(posCart[id].qty<=0) delete posCart[id]; renderPosCart(); };
+  function renderPosCart(){
+    const box=$("posItems"); if(!box) return;
+    const entries=Object.values(posCart);
+    box.innerHTML=entries.length? entries.map((e)=>`
+      <div class="pos-it">
+        <div class="grow"><b>${esc(e.product.name)}</b><span>${rupiah(e.product.price)}</span></div>
+        <div class="qty"><button onclick="posQty('${e.product.id}',-1)">−</button><span>${e.qty}</span><button onclick="posQty('${e.product.id}',1)">+</button></div>
+        <div class="lt">${rupiah(e.product.price*e.qty)}</div>
+      </div>`).join("")
+      : `<div class="empty" style="padding:24px"><div class="big">🛒</div>Belum ada produk.</div>`;
+    const subtotal=entries.reduce((s,e)=>s+e.product.price*e.qty,0);
+    let disc=Math.round(Number(($("posDiscount")||{}).value||0)); if(disc<0)disc=0; if(disc>subtotal)disc=subtotal;
+    posTotalNow=subtotal-disc;
+    $("posSubtotal").textContent=rupiah(subtotal);
+    $("posDiscView").textContent="− "+rupiah(disc);
+    $("posTotal").textContent=rupiah(posTotalNow);
+    renderPosChange();
+  }
+  // Metode bayar & kembalian
+  let posMethod="cash"; let posTotalNow=0;
+  function roundUp(n,step){ return Math.ceil(n/step)*step; }
+  function renderPosChange(){
+    const box=$("posCashBox"); if(!box) return;
+    // tombol nominal cepat
+    const quick=$("posQuick");
+    if(quick){
+      const opts=[posTotalNow, roundUp(posTotalNow,5000), roundUp(posTotalNow,10000), roundUp(posTotalNow,50000), 50000, 100000, 150000]
+        .filter((v)=>v>=posTotalNow && v>0);
+      const uniq=[...new Set(opts)].slice(0,4);
+      quick.innerHTML=uniq.map((v,i)=>`<button type="button" class="qc" data-v="${v}">${i===0?"Pas":rupiah(v)}</button>`).join("");
+      quick.querySelectorAll(".qc").forEach((b)=>b.addEventListener("click",()=>{ $("posPaid").value=b.getAttribute("data-v"); renderPosChange(); }));
+    }
+    const paid=Math.round(Number(($("posPaid")||{}).value||0));
+    const change=paid-posTotalNow;
+    const el=$("posChange"); if(!el) return;
+    if(posMethod==="cash" && paid>0 && change<0){ el.textContent="Kurang "+rupiah(-change); el.style.color="#d40000"; }
+    else { el.textContent=rupiah(Math.max(0,change)); el.style.color=""; }
+  }
+  async function savePos(){
+    const entries=Object.values(posCart);
+    if(!entries.length){ toast("Keranjang masih kosong.",true); return; }
+    const paid=Math.round(Number(($("posPaid")||{}).value||0));
+    if(posMethod==="cash" && paid<posTotalNow){ toast("Uang dibayar kurang dari total.",true); return; }
+    const btn=$("posSave"); btn.disabled=true; btn.textContent="Menyimpan...";
+    try{
+      const body={
+        items:entries.map((e)=>({id:e.product.id,qty:e.qty})),
+        customer:{name:$("posName").value.trim(),phone:$("posPhone").value.trim()},
+        discount:Math.round(Number($("posDiscount").value||0)),
+        note:$("posNote").value.trim(),
+        payment_method:posMethod,
+        paid_amount:posMethod==="cash"?paid:posTotalNow,
+      };
+      const r=await api("/api/orders/pos",{method:"POST",body:JSON.stringify(body)});
+      const kembali=(r.change_amount||0)>0 ? ` — kembalian ${rupiah(r.change_amount)}` : "";
+      toast(`Pesanan tersimpan! ${rupiah(r.total)}${kembali} 🎉`);
+      posCart={}; renderPosProducts($("posSearch").value); renderPosCart();
+      $("posName").value=""; $("posPhone").value=""; $("posDiscount").value=""; $("posNote").value=""; $("posPaid").value="";
+      posMethod="cash";
+      $("posMethods").querySelectorAll(".pm").forEach((x)=>x.classList.toggle("active",x.getAttribute("data-m")==="cash"));
+      $("posCashBox").style.display="block";
+      renderPosChange();
+    }catch(e){ toast(e.message,true); }
+    finally{ btn.disabled=false; btn.textContent="💾 Simpan Pesanan (Lunas)"; }
   }
 
   // ================= ORDERS =================
@@ -388,6 +648,8 @@
         <div class="od-row"><span class="muted">Subtotal</span><span class="mono">${rupiah(o.subtotal)}</span></div>
         ${o.discount>0?`<div class="od-row"><span class="muted">Diskon ${esc(o.voucher_code||"")}</span><span class="mono">- ${rupiah(o.discount)}</span></div>`:""}
         <div class="od-row" style="border:none"><b>Total</b><b class="mono">${rupiah(o.total)}</b></div>
+        ${o.payment_method?`<div class="od-row"><span class="muted">Metode Bayar</span><span>${({cash:"💵 Cash",qris:"📱 QRIS",transfer:"🏦 Transfer"})[o.payment_method]||o.payment_method}</span></div>`:""}
+        ${o.paid_amount!=null&&o.payment_method==="cash"?`<div class="od-row"><span class="muted">Uang Dibayar</span><span class="mono">${rupiah(o.paid_amount)}</span></div><div class="od-row"><span class="muted">Kembalian</span><span class="mono">${rupiah(o.change_amount||0)}</span></div>`:""}
         <p class="muted" style="font-size:.82rem;margin:14px 0 6px">Bukti pembayaran</p>${proof}
         <p class="muted" style="font-size:.82rem;margin:16px 0 6px">Ubah status</p>
         <div class="status-set">

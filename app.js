@@ -11,6 +11,8 @@ import ordersRouter from "./routes/orders.js";
 import vouchersRouter from "./routes/vouchers.js";
 import uploadsRouter from "./routes/uploads.js";
 import lombaRouter from "./routes/lomba.js";
+import dashboardRouter from "./routes/dashboard.js";
+import accountRouter from "./routes/account.js";
 import { categoriesRouter, bannersRouter, promosRouter, galleryRouter } from "./routes/cms.js";
 import { testimonialsRouter, reviewsRouter } from "./routes/testimonials.js";
 import {
@@ -41,6 +43,8 @@ app.use("/api/orders", ordersRouter);
 app.use("/api/vouchers", vouchersRouter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/api/lomba", lombaRouter);
+app.use("/api/dashboard", dashboardRouter);
+app.use("/api/account", accountRouter);
 app.use("/api/testimonials", testimonialsRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/gallery", galleryRouter);

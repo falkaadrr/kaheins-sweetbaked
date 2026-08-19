@@ -1242,6 +1242,7 @@
         <div class="nav-links">
           <a href="#produk" class="pill hide-mobile">Menu</a>
           <a href="#alamat" class="pill hide-mobile">Lokasi</a>
+          <a href="/akun.html" class="pill">Akun</a>
           <button class="cart-btn" id="openCart">
             <i data-feather="shopping-cart"></i> Keranjang
             <span class="cart-count" id="navCount">0</span>
@@ -1556,6 +1557,7 @@
     </div>
 
     <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
       // ====== KONFIGURASI ======
@@ -1567,6 +1569,16 @@
       // (Kalau suatu saat frontend dipisah ke domain lain, isi URL lengkap
       // backend di sini, misal "https://xxx.up.railway.app".)
       const BACKEND_URL = (window.BACKEND_URL || "");
+
+      // --- Supabase Auth (akun customer) ---
+      const sb = (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY)
+        ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
+        : null;
+      async function getAuthToken() {
+        if (!sb) return null;
+        try { const { data } = await sb.auth.getSession(); return data?.session?.access_token || null; }
+        catch { return null; }
+      }
 
       // Order yang baru dibuat di server: { id, total } | null
       let currentOrder = null;
@@ -1648,8 +1660,32 @@
           products = [];
         }
         renderProducts();
+        maybeApplyReorder();
       }
       loadProducts();
+
+      // Pesan ulang: dipanggil dari halaman Akun (akun.html) via localStorage.
+      function maybeApplyReorder() {
+        let raw = null;
+        try { raw = localStorage.getItem("kaheins_reorder"); } catch { return; }
+        if (!raw) return;
+        try {
+          const items = JSON.parse(raw); // [{id, qty}]
+          let added = 0;
+          (items || []).forEach((it) => {
+            if (products.find((p) => p.id === it.id)) {
+              cart[it.id] = (cart[it.id] || 0) + (Number(it.qty) || 1);
+              added++;
+            }
+          });
+          if (added) {
+            renderCart();
+            if (typeof openDrawer === "function") openDrawer();
+            showToast("Pesanan dimuat ke keranjang 🛒", "shopping-cart");
+          }
+        } catch {}
+        try { localStorage.removeItem("kaheins_reorder"); } catch {}
+      }
 
       // ====== BANNER CAROUSEL ======
       async function loadBanners() {
@@ -2018,9 +2054,10 @@
 
       // Kirim order ke backend -> tersimpan di Supabase. Balikin { order_id, total } | null
       async function saveOrderToServer(name, address) {
+        const token = await getAuthToken();
         const res = await fetch(BACKEND_URL + "/api/orders", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
           body: JSON.stringify({
             customer: {
               name,

@@ -8,13 +8,16 @@ jalan dari domain yang sama. Storage Supabase gratis tanpa perlu kartu kredit.
 
 buka web → lihat produk → keranjang → voucher (opsional) → form nama/alamat/HP →
 transfer QRIS → **upload bukti → langsung masuk database**. Tombol WhatsApp opsional
-(langsung buka chat admin, tanpa cari kontak).
+(langsung buka chat admin, tanpa cari kontak). Customer juga bisa bikin akun
+(Supabase Auth) buat lihat riwayat pesanan.
 
 ## Modul
 
 CRUD via dashboard: **Produk, Kategori, Banner, Promo, Voucher, Testimoni**. Plus
-API: **Order** (nomor `KHS/YYYYMMDD/XXXX`, QRIS + bukti), **Customer** (otomatis),
-Settings, Homepage CMS, Gallery, Media, Notifications, Audit log. Login admin **JWT**.
+API: **Order** (nomor `KHS/YYYYMMDD/XXXX`, QRIS + bukti), **POS/Kasir** (order
+manual offline), **Dashboard ringkasan** (omzet, tren, best seller), **Akun
+Customer** (riwayat pesanan), Settings, Homepage CMS, Gallery, Media,
+Notifications, Audit log. Login admin **JWT**.
 
 ## Struktur
 
@@ -25,23 +28,31 @@ kaheins-sweetbaked/
 ├── app.js                # inti Express app (dipakai server.js & api/index.js)
 ├── config/supabase.js    # koneksi Supabase
 ├── middleware/           # auth (JWT), error
-├── lib/                  # helpers, crud factory, pricing
-├── routes/               # auth, products, orders, vouchers, cms, testimonials, misc
-├── schema.sql            # semua tabel + seed
-├── schema-lomba.sql      # tabel fitur lomba
-├── public/               # index.html (toko), admin.html (POS), lomba.html, images/
+├── lib/                  # helpers, crud factory, pricing, authUser
+├── routes/                # auth, products, orders (+POS), dashboard, account,
+│                          # vouchers, cms, testimonials, misc
+├── schema.sql             # semua tabel + seed
+├── schema-lomba.sql       # tabel fitur lomba
+├── schema-dashboard-pos.sql  # kolom orders.source + index dashboard
+├── schema-accounts.sql       # kolom orders.user_id (akun customer)
+├── schema-pos-payment.sql    # kolom pembayaran POS
+├── public/                # index.html (toko), admin.html (POS), akun.html,
+│                          # lomba.html, images/
 ├── vercel.json            # routing: statis di /public, sisanya ke api/index.js
 ├── .env.example
-└── DEPLOY-VERCEL.md      # panduan deploy lengkap
+└── DEPLOY-VERCEL.md       # panduan deploy lengkap
 ```
 
 ## Setup Supabase
 
 1. Buat project di [supabase.com](https://supabase.com).
 2. **SQL Editor** → tempel `schema.sql` → **Run**.
-3. **Storage** → buat 2 bucket **Private**: `bukti-bayar` dan `media`.
-4. **Storage** → buat 1 bucket **Public** bernama `uploads` (buat gambar produk/banner/promo yang diupload dari admin).
-5. **Project Settings → API** → catat `Project URL` + `service_role` key.
+3. Jalankan juga migrasi tambahan (sekali per file, urutan bebas):
+   `schema-lomba.sql`, `schema-dashboard-pos.sql`, `schema-accounts.sql`,
+   `schema-pos-payment.sql`.
+4. **Storage** → buat 2 bucket **Private**: `bukti-bayar` dan `media`.
+5. **Storage** → buat 1 bucket **Public** bernama `uploads` (buat gambar produk/banner/promo yang diupload dari admin).
+6. **Project Settings → API** → catat `Project URL` + `service_role` key (untuk backend) + `anon`/`publishable` key (untuk `public/config.js`, dipakai fitur akun customer).
 
 ## Jalankan lokal
 
@@ -78,6 +89,6 @@ isi Environment Variables, custom domain).
 - Harga & voucher dihitung/divalidasi di server — frontend tak bisa memalsukan total.
 - Kalau sebelumnya sempat pakai Firebase: sekarang balik ke Supabase karena Firebase
   Storage butuh upgrade Blaze (berbayar), sedangkan Supabase Storage gratis.
-- UI dashboard: Pesanan (POS), Produk, Kategori, Banner, Promo, Voucher, Testimoni.
-  Modul lain (media, homepage, settings, gallery, customers, notifications, audit)
-  API-nya sudah jalan, UI bisa ditambah menyusul.
+- UI dashboard: Ringkasan (dashboard), Pesanan (POS), Produk, Kategori, Banner,
+  Promo, Voucher, Testimoni. Modul lain (media, homepage, settings, gallery,
+  customers, notifications, audit) API-nya sudah jalan, UI bisa ditambah menyusul.

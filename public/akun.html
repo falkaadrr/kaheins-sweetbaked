@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akun — Kaheins Sweetbaked</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root{--white:#fff;--pink:#ff5ba3;--pink-soft:#ffd6e8;--blue:#2d5bff;--blue-soft:#cfe0ff;--ink:#111;
+        --border:3px solid var(--ink);--shadow-sm:4px 4px 0 var(--ink);--shadow:6px 6px 0 var(--ink);--shadow-lg:9px 9px 0 var(--ink);}
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:"Space Grotesk",sans-serif;color:var(--ink);background:var(--white);
+        background-image:radial-gradient(var(--pink-soft) 1.4px,transparent 1.4px);background-size:26px 26px;min-height:100vh;padding:20px;line-height:1.5}
+      .wrap{max-width:620px;margin:0 auto}
+      h1,h2,h3{font-family:"Archivo Black",sans-serif;letter-spacing:-.5px;line-height:1.1}
+      .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+      .logo{display:inline-flex;align-items:center;gap:8px;font-family:"Archivo Black",sans-serif;font-size:1rem;text-decoration:none;color:var(--ink)}
+      .logo .b{width:34px;height:34px;display:grid;place-items:center;background:var(--pink);border:var(--border);box-shadow:var(--shadow-sm);font-size:1.1rem}
+      .back{font-weight:700;font-size:.85rem;text-decoration:none;color:var(--blue);border:var(--border);background:#fff;box-shadow:var(--shadow-sm);padding:8px 12px}
+      .card{background:#fff;border:var(--border);box-shadow:var(--shadow-lg);padding:28px 24px;margin-bottom:18px}
+      .eyebrow{display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;background:var(--pink-soft);border:var(--border);padding:5px 12px;margin-bottom:14px}
+      h1{font-size:clamp(1.6rem,6vw,2.2rem);text-transform:uppercase;margin-bottom:8px}
+      .muted{color:#666}
+      label{display:block;font-weight:700;font-size:.82rem;margin:14px 0 6px}
+      input{width:100%;font-family:inherit;font-size:1rem;padding:12px 14px;border:var(--border);background:#fff;box-shadow:var(--shadow-sm);outline:none}
+      input:focus{box-shadow:var(--shadow)}
+      .btn{width:100%;font-family:"Archivo Black",sans-serif;font-size:1.05rem;color:#fff;background:var(--pink);border:var(--border);box-shadow:var(--shadow);padding:15px;cursor:pointer;margin-top:20px;transition:transform .08s,box-shadow .08s}
+      .btn:hover:not(:disabled){transform:translate(-3px,-3px);box-shadow:var(--shadow-lg)}
+      .btn:disabled{opacity:.6;cursor:not-allowed}
+      .btn.line{background:#fff;color:var(--ink)}
+      .toggle{text-align:center;margin-top:16px;font-size:.9rem}
+      .toggle a{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline}
+      .msg{margin-top:14px;font-weight:700;font-size:.88rem;min-height:20px}
+      .msg.err{color:#d40000}.msg.ok{color:#0a8a55}
+      .acct-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+      .logout{font-weight:700;font-size:.82rem;color:var(--ink);border:var(--border);background:#fff;box-shadow:var(--shadow-sm);padding:8px 12px;cursor:pointer}
+      .logout:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow)}
+      .order{border:var(--border);box-shadow:var(--shadow-sm);padding:16px;margin-bottom:14px}
+      .order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+      .order-no{font-family:"Archivo Black",sans-serif;font-size:.9rem}
+      .order-date{font-size:.78rem;color:#666}
+      .pill{display:inline-block;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:20px;border:2px solid;white-space:nowrap}
+      .p-pending,.p-waiting_confirmation{color:#B5540C;border-color:#F5C99B;background:#FFF4E8}
+      .p-paid,.p-processing,.p-shipped{color:var(--blue);border-color:#B2CCFF;background:#EFF4FF}
+      .p-done{color:#0a8a55;border-color:#9BE3BE;background:#ECFDF3}
+      .p-cancelled{color:#d40000;border-color:#F5A3A3;background:#FDECEC}
+      .items{margin:12px 0;font-size:.88rem}
+      .items .it{display:flex;justify-content:space-between;padding:3px 0;color:#333}
+      .order-foot{display:flex;justify-content:space-between;align-items:center;border-top:2px dashed var(--ink);padding-top:12px;margin-top:10px}
+      .order-total{font-family:"Archivo Black",sans-serif;font-size:1.05rem}
+      .reorder{font-weight:700;font-size:.85rem;color:#fff;background:var(--blue);border:var(--border);box-shadow:var(--shadow-sm);padding:9px 14px;cursor:pointer}
+      .reorder:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow)}
+      .empty{text-align:center;padding:30px;color:#666}.empty .big{font-size:2.4rem;margin-bottom:8px}
+      .foot{text-align:center;font-size:.8rem;color:#666;padding:10px 0 20px}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <a class="logo" href="/"><span class="b">🍪</span>Kaheins Sweetbaked</a>
+        <a class="back" href="/">← Toko</a>
+      </div>
+
+      <!-- Konfig belum diisi -->
+      <div class="card" id="noConfig" style="display:none">
+        <span class="eyebrow">Akun</span>
+        <h1>Fitur akun belum aktif</h1>
+        <p class="muted">Admin belum mengisi konfigurasi Supabase Auth. Hubungi admin untuk mengaktifkan fitur akun.</p>
+      </div>
+
+      <!-- Form login / daftar -->
+      <div class="card" id="authCard" style="display:none">
+        <span class="eyebrow">Akun Kaheiners</span>
+        <h1 id="authTitle">Masuk</h1>
+        <p class="muted" id="authSub">Masuk untuk lihat riwayat pesanan & pesan ulang dengan cepat.</p>
+        <label>Email</label>
+        <input type="email" id="email" placeholder="email@contoh.com" autocomplete="email" />
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Minimal 6 karakter" autocomplete="current-password" />
+        <button class="btn" id="submitBtn">Masuk</button>
+        <div class="msg" id="authMsg"></div>
+        <div class="toggle" id="toggleWrap">Belum punya akun? <a id="toggleLink">Daftar di sini</a></div>
+      </div>
+
+      <!-- Sudah login -->
+      <div id="acctView" style="display:none">
+        <div class="card">
+          <div class="acct-head">
+            <div><span class="eyebrow">Halo, Kaheiners 👋</span><h2 id="acctEmail" style="font-size:1.05rem;word-break:break-all"></h2></div>
+            <button class="logout" id="logoutBtn">Keluar</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="text-transform:uppercase;font-size:1.1rem;margin-bottom:4px">Pesanan Saya</h3>
+          <p class="muted" style="font-size:.85rem;margin-bottom:14px">Riwayat pesanan yang kamu buat saat login.</p>
+          <div id="orders"><div class="empty"><div class="big">⏳</div>Memuat...</div></div>
+        </div>
+      </div>
+
+      <p class="foot">© Kaheins Sweetbaked</p>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const BACKEND_URL = window.BACKEND_URL || "";
+      const $ = (id) => document.getElementById(id);
+      const STATUS = { pending:"Menunggu Bayar", waiting_confirmation:"Cek Bukti", paid:"Lunas", processing:"Diproses", shipped:"Dikirim", done:"Selesai", cancelled:"Dibatalkan" };
+      const rupiah = (n) => "Rp " + Number(n||0).toLocaleString("id-ID");
+      const esc = (s) => String(s==null?"":s).replace(/[&<>"]/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+      const sb = (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY)
+        ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
+
+      let mode = "login"; // login | register
+
+      function show(which){
+        $("noConfig").style.display = which==="noconfig" ? "block":"none";
+        $("authCard").style.display = which==="auth" ? "block":"none";
+        $("acctView").style.display = which==="acct" ? "block":"none";
+      }
+      function setMode(m){
+        mode = m;
+        $("authTitle").textContent = m==="login" ? "Masuk" : "Daftar";
+        $("authSub").textContent = m==="login" ? "Masuk untuk lihat riwayat pesanan & pesan ulang dengan cepat." : "Bikin akun biar pesanan kamu tersimpan & gampang dipesan ulang.";
+        $("submitBtn").textContent = m==="login" ? "Masuk" : "Daftar";
+        $("password").autocomplete = m==="login" ? "current-password" : "new-password";
+        $("toggleWrap").innerHTML = m==="login" ? 'Belum punya akun? <a id="toggleLink">Daftar di sini</a>' : 'Sudah punya akun? <a id="toggleLink">Masuk di sini</a>';
+        $("toggleLink").addEventListener("click", ()=>setMode(m==="login"?"register":"login"));
+        $("authMsg").textContent = "";
+      }
+      function msg(t, ok){ const m=$("authMsg"); m.textContent=t; m.className="msg "+(ok?"ok":"err"); }
+
+      async function submitAuth(){
+        const email = $("email").value.trim(), password = $("password").value;
+        if(!email || !password){ msg("Isi email & password."); return; }
+        if(password.length < 6){ msg("Password minimal 6 karakter."); return; }
+        const btn = $("submitBtn"); btn.disabled=true; const orig=btn.textContent; btn.textContent="Sebentar...";
+        try{
+          if(mode==="login"){
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            if(error) throw error;
+            await enterAccount();
+          } else {
+            const { data, error } = await sb.auth.signUp({ email, password });
+            if(error) throw error;
+            if(data.session){ await enterAccount(); }
+            else { msg("Cek email kamu untuk verifikasi, lalu login ya.", true); setMode("login"); }
+          }
+        }catch(e){ msg(e.message || "Gagal. Coba lagi."); }
+        finally{ btn.disabled=false; btn.textContent=orig; }
+      }
+
+      async function enterAccount(){
+        const { data } = await sb.auth.getSession();
+        const user = data?.session?.user;
+        if(!user){ show("auth"); return; }
+        $("acctEmail").textContent = user.email || "Akun kamu";
+        show("acct");
+        loadOrders();
+      }
+
+      async function loadOrders(){
+        const box = $("orders");
+        try{
+          const { data:s } = await sb.auth.getSession();
+          const token = s?.session?.access_token;
+          const res = await fetch(BACKEND_URL + "/api/account/orders", { headers:{ Authorization:"Bearer "+token } });
+          const json = await res.json().catch(()=>({}));
+          if(!res.ok) throw new Error(json.error||"Gagal memuat pesanan");
+          const orders = json.data || [];
+          if(!orders.length){ box.innerHTML = `<div class="empty"><div class="big">🍪</div>Belum ada pesanan. Yuk belanja dulu!</div>`; return; }
+          box.innerHTML = orders.map((o)=>{
+            const items = (o.items||[]).map((i)=>`<div class="it"><span>${i.qty} × ${esc(i.product_name)}</span><span>${rupiah(i.line_total)}</span></div>`).join("");
+            const d = new Date(o.created_at).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
+            const st = STATUS[o.status]||o.status;
+            const payload = JSON.stringify((o.items||[]).map((i)=>({id:i.product_id, qty:i.qty})));
+            return `<div class="order">
+              <div class="order-top">
+                <div><div class="order-no">${esc(o.order_no||"-")}</div><div class="order-date">${d}</div></div>
+                <span class="pill p-${o.status}">${st}</span>
+              </div>
+              <div class="items">${items || '<span class="muted">—</span>'}</div>
+              <div class="order-foot">
+                <span class="order-total">${rupiah(o.total)}</span>
+                <button class="reorder" data-items='${payload.replace(/'/g,"&#39;")}'>🔁 Pesan Lagi</button>
+              </div>
+            </div>`;
+          }).join("");
+          box.querySelectorAll(".reorder").forEach((b)=>b.addEventListener("click",()=>reorder(b.getAttribute("data-items"))));
+        }catch(e){ box.innerHTML = `<div class="empty"><div class="big">⚠️</div>${esc(e.message)}</div>`; }
+      }
+
+      function reorder(itemsJson){
+        try{
+          const items = JSON.parse(itemsJson).filter((i)=>i.id);
+          if(!items.length){ alert("Produk pesanan ini tidak bisa dimuat ulang."); return; }
+          localStorage.setItem("kaheins_reorder", JSON.stringify(items));
+          window.location.href = "/";
+        }catch{ alert("Gagal memuat ulang pesanan."); }
+      }
+
+      async function init(){
+        if(!sb){ show("noconfig"); return; }
+        setMode("login");
+        $("submitBtn").addEventListener("click", submitAuth);
+        $("password").addEventListener("keydown",(e)=>{ if(e.key==="Enter") submitAuth(); });
+        $("logoutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); show("auth"); });
+        const { data } = await sb.auth.getSession();
+        if(data?.session){ enterAccount(); } else { show("auth"); }
+      }
+      init();
+    </script>
+  </body>
+</html>

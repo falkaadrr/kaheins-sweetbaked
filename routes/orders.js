@@ -4,6 +4,7 @@ import { supabase, PROOF_BUCKET } from "../config/supabase.js";
 import { requireAuth } from "../middleware/auth.js";
 import { wrap, ValidationError, notify, genOrderNo, signedUrl } from "../lib/helpers.js";
 import { buildLineItems, calcSubtotal, computeDiscount, getActiveVoucher } from "../lib/pricing.js";
+import { getUserFromReq } from "../lib/authUser.js";
 
 const router = express.Router();
 const upload = multer({
@@ -44,10 +45,12 @@ router.post("/", wrap(async (req, res) => {
   const discount = computeDiscount(voucher, subtotal);
   const total = subtotal - discount;
   const customerId = await upsertCustomer({ name, phone, address, total });
+  const user = await getUserFromReq(req); // null kalau checkout sebagai tamu
 
   const { data: order, error } = await supabase.from("orders").insert({
     order_no: genOrderNo(), customer_id: customerId, customer_name: name,
     customer_phone: phone || null, customer_address: address, is_preorder: !!is_preorder,
+    user_id: user ? user.id : null,
     voucher_code: voucher ? voucher.code : null, subtotal, discount, total, status: "pending",
   }).select().single();
   if (error) throw error;
@@ -56,6 +59,57 @@ router.post("/", wrap(async (req, res) => {
   if (itemErr) throw itemErr;
   await notify("order", "Pesanan baru", `${name} — Rp ${total.toLocaleString("id-ID")}`);
   res.status(201).json({ order_id: order.id, order_no: order.order_no, subtotal, discount, total, voucher_code: order.voucher_code, status: order.status });
+}));
+
+// POST /api/orders/pos (admin) — kasir: admin bikin order manual di CMS
+router.post("/pos", requireAuth, wrap(async (req, res) => {
+  const { items, customer, discount: manualDiscount, note, voucher_code, payment_method, paid_amount } = req.body || {};
+  const name = String(customer?.name || "").trim() || "Pelanggan";
+  const phone = String(customer?.phone || "").trim();
+  const address = String(customer?.address || "").trim() || "POS / Offline";
+
+  const lines = await buildLineItems(items);
+  const subtotal = calcSubtotal(lines);
+
+  // Diskon: dari voucher, atau angka manual yang diinput kasir
+  let discount = 0, usedVoucher = null;
+  if (voucher_code) {
+    usedVoucher = await getActiveVoucher(voucher_code);
+    if (!usedVoucher) throw new ValidationError("Kode voucher tidak valid.");
+    discount = computeDiscount(usedVoucher, subtotal);
+  } else if (manualDiscount) {
+    const d = Math.round(Number(manualDiscount) || 0);
+    if (d < 0) throw new ValidationError("Diskon tidak valid.");
+    discount = Math.min(d, subtotal);
+  }
+  const total = subtotal - discount;
+
+  // Metode bayar + kembalian
+  const method = ["cash", "qris", "transfer"].includes(payment_method) ? payment_method : "cash";
+  let paid = Math.round(Number(paid_amount) || 0);
+  let change = 0;
+  if (method === "cash") {
+    if (paid < total) throw new ValidationError("Uang dibayar kurang dari total.");
+    change = paid - total;
+  } else {
+    paid = total; change = 0; // non-cash dianggap pas
+  }
+
+  const customerId = await upsertCustomer({ name, phone, address, total });
+  const { data: order, error } = await supabase.from("orders").insert({
+    order_no: genOrderNo(), customer_id: customerId, customer_name: name,
+    customer_phone: phone || null, customer_address: address, is_preorder: false,
+    voucher_code: usedVoucher ? usedVoucher.code : null, subtotal, discount, total,
+    status: "paid", source: "pos", note: note ? String(note).trim() : null,
+    payment_method: method, paid_amount: paid, change_amount: change,
+  }).select().single();
+  if (error) throw error;
+
+  const { error: itemErr } = await supabase.from("order_items").insert(lines.map((l) => ({ ...l, order_id: order.id })));
+  if (itemErr) throw itemErr;
+
+  await notify("order", "Penjualan POS", `${name} — Rp ${total.toLocaleString("id-ID")}`);
+  res.status(201).json({ order_id: order.id, order_no: order.order_no, subtotal, discount, total, payment_method: method, paid_amount: paid, change_amount: change });
 }));
 
 // POST /api/orders/vouchers/check (publik)
