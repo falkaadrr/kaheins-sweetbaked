@@ -1138,106 +1138,272 @@
         }
       }
       /* ===== BANNER CAROUSEL ===== */
-      .banner-sec { padding: 22px 0 4px; }
+      .banner-sec {
+        padding: 22px 0 4px;
+      }
       .carousel {
-        position: relative; border: var(--border); box-shadow: var(--shadow);
-        background: var(--blue-soft); overflow: hidden; border-radius: 2px;
+        position: relative;
+        border: var(--border);
+        box-shadow: var(--shadow);
+        background: var(--blue-soft);
+        overflow: hidden;
+        border-radius: 2px;
       }
-      .carousel-track { display: flex; transition: transform 0.5s ease; }
+      .carousel-track {
+        display: flex;
+        transition: transform 0.5s ease;
+      }
       .slide {
-        min-width: 100%; position: relative; aspect-ratio: 3.2 / 1;
-        display: flex; align-items: center; overflow: hidden;
+        min-width: 100%;
+        position: relative;
+        aspect-ratio: 3.2 / 1;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
       }
-      .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .slide img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
       .slide .slide-txt {
-        position: relative; z-index: 2; padding: 24px 28px; max-width: 65%;
-        background: linear-gradient(90deg, rgba(255,255,255,0.92), rgba(255,255,255,0.4) 80%, transparent);
-        height: 100%; display: flex; flex-direction: column; justify-content: center;
+        position: relative;
+        z-index: 2;
+        padding: 24px 28px;
+        max-width: 65%;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.92),
+          rgba(255, 255, 255, 0.4) 80%,
+          transparent
+        );
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
-      .slide h3 { font-size: 1.5rem; line-height: 1.05; margin-bottom: 6px; }
-      .slide p { font-weight: 600; font-size: 0.92rem; }
-      .slide.no-img .slide-txt { background: none; max-width: 100%; }
+      .slide h3 {
+        font-size: 1.5rem;
+        line-height: 1.05;
+        margin-bottom: 6px;
+      }
+      .slide p {
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+      .slide.no-img .slide-txt {
+        background: none;
+        max-width: 100%;
+      }
       .carousel-dots {
-        position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-        display: flex; gap: 7px; z-index: 3;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 7px;
+        z-index: 3;
       }
       .carousel-dots button {
-        width: 11px; height: 11px; border: 2px solid var(--ink); background: #fff;
-        border-radius: 50%; padding: 0; cursor: pointer;
+        width: 11px;
+        height: 11px;
+        border: 2px solid var(--ink);
+        background: #fff;
+        border-radius: 50%;
+        padding: 0;
+        cursor: pointer;
       }
-      .carousel-dots button.on { background: var(--pink); }
+      .carousel-dots button.on {
+        background: var(--pink);
+      }
       .carousel-nav {
-        position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
-        width: 38px; height: 38px; border: var(--border); background: #fff;
-        box-shadow: var(--shadow-sm); font-weight: 900; font-size: 1.1rem; cursor: pointer;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        width: 38px;
+        height: 38px;
+        border: var(--border);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        font-weight: 900;
+        font-size: 1.1rem;
+        cursor: pointer;
       }
-      .carousel-nav.prev { left: 10px; } .carousel-nav.next { right: 10px; }
+      .carousel-nav.prev {
+        left: 10px;
+      }
+      .carousel-nav.next {
+        right: 10px;
+      }
       @media (max-width: 640px) {
-        .slide { aspect-ratio: 2 / 1; }
-        .slide .slide-txt { max-width: 85%; }
-        .slide h3 { font-size: 1.1rem; }
-        .carousel-nav { width: 32px; height: 32px; font-size: 0.95rem; }
-        .carousel-nav.prev { left: 6px; } .carousel-nav.next { right: 6px; }
+        .slide {
+          aspect-ratio: 2 / 1;
+        }
+        .slide .slide-txt {
+          max-width: 85%;
+        }
+        .slide h3 {
+          font-size: 1.1rem;
+        }
+        .carousel-nav {
+          width: 32px;
+          height: 32px;
+          font-size: 0.95rem;
+        }
+        .carousel-nav.prev {
+          left: 6px;
+        }
+        .carousel-nav.next {
+          right: 6px;
+        }
       }
 
       /* ===== PROMO GRID ===== */
       .promo-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         gap: 16px;
       }
       .promo-card {
-        border: var(--border); box-shadow: var(--shadow-sm); background: #fff;
-        overflow: hidden; display: flex; flex-direction: column;
-        transition: transform 0.08s, box-shadow 0.08s;
+        border: var(--border);
+        box-shadow: var(--shadow-sm);
+        background: #fff;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+          transform 0.08s,
+          box-shadow 0.08s;
       }
-      .promo-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
-      .promo-card .p-img { aspect-ratio: 16 / 9; background: var(--pink-soft); overflow: hidden; }
-      .promo-card .p-img img { width: 100%; height: 100%; object-fit: cover; }
-      .promo-card .p-body { padding: 14px 16px; }
+      .promo-card:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--shadow);
+      }
+      .promo-card .p-img {
+        aspect-ratio: 16 / 9;
+        background: var(--pink-soft);
+        overflow: hidden;
+      }
+      .promo-card .p-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .promo-card .p-body {
+        padding: 14px 16px;
+      }
       .promo-card .p-badge {
-        display: inline-block; background: var(--pink); color: #fff; font-weight: 800;
-        font-size: 0.7rem; padding: 3px 10px; border: 2px solid var(--ink);
-        text-transform: uppercase; margin-bottom: 8px;
+        display: inline-block;
+        background: var(--pink);
+        color: #fff;
+        font-weight: 800;
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        border: 2px solid var(--ink);
+        text-transform: uppercase;
+        margin-bottom: 8px;
       }
-      .promo-card h4 { font-size: 1.05rem; margin-bottom: 4px; }
-      .promo-card p { font-size: 0.85rem; font-weight: 500; color: #444; }
+      .promo-card h4 {
+        font-size: 1.05rem;
+        margin-bottom: 4px;
+      }
+      .promo-card p {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #444;
+      }
 
       /* ===== PROMO POPUP ===== */
       .promo-pop {
-        position: fixed; inset: 0; background: rgba(17, 17, 17, 0.55); z-index: 90;
-        display: none; place-items: center; padding: 20px;
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 17, 17, 0.55);
+        z-index: 90;
+        display: none;
+        place-items: center;
+        padding: 20px;
       }
-      .promo-pop.show { display: grid; }
+      .promo-pop.show {
+        display: grid;
+      }
       .promo-pop-card {
-        background: #fff; border: var(--border); box-shadow: var(--shadow-lg);
-        width: min(420px, 100%); max-height: 88vh; overflow: auto; position: relative;
+        background: #fff;
+        border: var(--border);
+        box-shadow: var(--shadow-lg);
+        width: min(420px, 100%);
+        max-height: 88vh;
+        overflow: auto;
+        position: relative;
       }
       .promo-pop-card .pp-close {
-        position: absolute; top: 10px; right: 10px; z-index: 2; width: 36px; height: 36px;
-        border: var(--border); background: #fff; box-shadow: var(--shadow-sm);
-        font-weight: 900; font-size: 1rem; cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 2;
+        width: 36px;
+        height: 36px;
+        border: var(--border);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        font-weight: 900;
+        font-size: 1rem;
+        cursor: pointer;
       }
-      .promo-pop-card .pp-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-bottom: var(--border); display: block; }
-      .promo-pop-card .pp-body { padding: 20px 22px 24px; }
+      .promo-pop-card .pp-img {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        border-bottom: var(--border);
+        display: block;
+      }
+      .promo-pop-card .pp-body {
+        padding: 20px 22px 24px;
+      }
       .promo-pop-card .p-badge {
-        display: inline-block; background: var(--pink); color: #fff; font-weight: 800;
-        font-size: 0.72rem; padding: 3px 11px; border: 2px solid var(--ink);
-        text-transform: uppercase; margin-bottom: 10px;
+        display: inline-block;
+        background: var(--pink);
+        color: #fff;
+        font-weight: 800;
+        font-size: 0.72rem;
+        padding: 3px 11px;
+        border: 2px solid var(--ink);
+        text-transform: uppercase;
+        margin-bottom: 10px;
       }
-      .promo-pop-card h3 { font-size: 1.35rem; margin-bottom: 8px; }
-      .promo-pop-card p { font-weight: 500; color: #333; margin-bottom: 6px; }
-      .pp-extra { margin-top: 14px; padding-top: 14px; border-top: 2px dashed var(--ink); }
-      .pp-extra .pp-mini { font-size: 0.86rem; font-weight: 600; padding: 4px 0; }
+      .promo-pop-card h3 {
+        font-size: 1.35rem;
+        margin-bottom: 8px;
+      }
+      .promo-pop-card p {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 6px;
+      }
+      .pp-extra {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 2px dashed var(--ink);
+      }
+      .pp-extra .pp-mini {
+        font-size: 0.86rem;
+        font-weight: 600;
+        padding: 4px 0;
+      }
     </style>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
   </head>
   <body>
     <!-- NAV -->
     <nav>
       <div class="nav-in">
         <a href="#top" class="logo"
-          ><span class="badge"><img src="images/logo.png" alt="Kaheins" /></span>Kaheins Sweetbaked<span
-            style="color: var(--pink)"
-          ></span
+          ><span class="badge"><img src="images/logo.png" alt="Kaheins" /></span
+          >Kaheins Sweetbaked<span style="color: var(--pink)"></span
         ></a>
         <div class="nav-links">
           <a href="#produk" class="pill hide-mobile">Menu</a>
@@ -1301,8 +1467,20 @@
       <div class="wrap">
         <div class="carousel" id="carousel">
           <div class="carousel-track" id="carouselTrack"></div>
-          <button class="carousel-nav prev" id="carPrev" aria-label="Sebelumnya">‹</button>
-          <button class="carousel-nav next" id="carNext" aria-label="Berikutnya">›</button>
+          <button
+            class="carousel-nav prev"
+            id="carPrev"
+            aria-label="Sebelumnya"
+          >
+            ‹
+          </button>
+          <button
+            class="carousel-nav next"
+            id="carNext"
+            aria-label="Berikutnya"
+          >
+            ›
+          </button>
           <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </div>
@@ -1436,11 +1614,7 @@
           </div>
           <div>
             <label for="buyerPhone">No. WhatsApp / HP (opsional)</label>
-            <input
-              type="tel"
-              id="buyerPhone"
-              placeholder="08xxxxxxxxxx"
-            />
+            <input type="tel" id="buyerPhone" placeholder="08xxxxxxxxxx" />
           </div>
         </div>
         <button class="checkout" id="checkoutBtn" disabled>
@@ -1505,11 +1679,13 @@
             <img id="proofImg" alt="Bukti pembayaran" />
           </div>
           <button class="checkout" id="sendOrderBtn">
-            <i data-feather="message-circle"></i> Chat Admin via WhatsApp (opsional)
+            <i data-feather="message-circle"></i> Chat Admin via WhatsApp
+            (opsional)
           </button>
           <p class="pay-note">
             Bukti bayar kamu sudah otomatis masuk ke sistem begitu di-upload.
-            Tombol ini opsional — buat chat admin langsung kalau mau konfirmasi 🙏
+            Tombol ini opsional — buat chat admin langsung kalau mau konfirmasi
+            🙏
           </p>
         </div>
       </div>
@@ -1551,7 +1727,9 @@
     <!-- PROMO POPUP (muncul sekali per sesi) -->
     <div class="promo-pop" id="promoPop">
       <div class="promo-pop-card" id="promoPopCard">
-        <button class="pp-close" id="promoPopClose" aria-label="Tutup">✕</button>
+        <button class="pp-close" id="promoPopClose" aria-label="Tutup">
+          ✕
+        </button>
         <div id="promoPopContent"></div>
       </div>
     </div>
@@ -1568,16 +1746,24 @@
       // server (Railway) yang SAMA — jadi cukup panggil "/api/..." relatif.
       // (Kalau suatu saat frontend dipisah ke domain lain, isi URL lengkap
       // backend di sini, misal "https://xxx.up.railway.app".)
-      const BACKEND_URL = (window.BACKEND_URL || "");
+      const BACKEND_URL = window.BACKEND_URL || "";
 
       // --- Supabase Auth (akun customer) ---
-      const sb = (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY)
-        ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
-        : null;
+      const sb =
+        window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
+          ? window.supabase.createClient(
+              window.SUPABASE_URL,
+              window.SUPABASE_ANON_KEY,
+            )
+          : null;
       async function getAuthToken() {
         if (!sb) return null;
-        try { const { data } = await sb.auth.getSession(); return data?.session?.access_token || null; }
-        catch { return null; }
+        try {
+          const { data } = await sb.auth.getSession();
+          return data?.session?.access_token || null;
+        } catch {
+          return null;
+        }
       }
 
       // Order yang baru dibuat di server: { id, total } | null
@@ -1667,7 +1853,11 @@
       // Pesan ulang: dipanggil dari halaman Akun (akun.html) via localStorage.
       function maybeApplyReorder() {
         let raw = null;
-        try { raw = localStorage.getItem("kaheins_reorder"); } catch { return; }
+        try {
+          raw = localStorage.getItem("kaheins_reorder");
+        } catch {
+          return;
+        }
         if (!raw) return;
         try {
           const items = JSON.parse(raw); // [{id, qty}]
@@ -1684,7 +1874,9 @@
             showToast("Pesanan dimuat ke keranjang 🛒", "shopping-cart");
           }
         } catch {}
-        try { localStorage.removeItem("kaheins_reorder"); } catch {}
+        try {
+          localStorage.removeItem("kaheins_reorder");
+        } catch {}
       }
 
       // ====== BANNER CAROUSEL ======
@@ -1724,20 +1916,44 @@
         const go = (i) => {
           idx = (i + total) % total;
           track.style.transform = `translateX(-${idx * 100}%)`;
-          dots.querySelectorAll("button").forEach((d, k) => d.classList.toggle("on", k === idx));
+          dots
+            .querySelectorAll("button")
+            .forEach((d, k) => d.classList.toggle("on", k === idx));
         };
-        dots.innerHTML = banners.map((_, k) => `<button aria-label="slide ${k + 1}"></button>`).join("");
-        dots.querySelectorAll("button").forEach((d, k) => d.addEventListener("click", () => go(k)));
-        document.getElementById("carPrev").addEventListener("click", () => go(idx - 1));
-        document.getElementById("carNext").addEventListener("click", () => go(idx + 1));
+        dots.innerHTML = banners
+          .map((_, k) => `<button aria-label="slide ${k + 1}"></button>`)
+          .join("");
+        dots
+          .querySelectorAll("button")
+          .forEach((d, k) => d.addEventListener("click", () => go(k)));
+        document
+          .getElementById("carPrev")
+          .addEventListener("click", () => go(idx - 1));
+        document
+          .getElementById("carNext")
+          .addEventListener("click", () => go(idx + 1));
         go(0);
 
         // swipe di HP (geser kiri/kanan ganti banner)
         if (total > 1) {
           const car = document.getElementById("carousel");
-          let startX = 0, dx = 0;
-          car.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; dx = 0; }, { passive: true });
-          car.addEventListener("touchmove", (e) => { dx = e.touches[0].clientX - startX; }, { passive: true });
+          let startX = 0,
+            dx = 0;
+          car.addEventListener(
+            "touchstart",
+            (e) => {
+              startX = e.touches[0].clientX;
+              dx = 0;
+            },
+            { passive: true },
+          );
+          car.addEventListener(
+            "touchmove",
+            (e) => {
+              dx = e.touches[0].clientX - startX;
+            },
+            { passive: true },
+          );
           car.addEventListener("touchend", () => {
             if (Math.abs(dx) > 40) go(dx < 0 ? idx + 1 : idx - 1);
           });
@@ -1748,7 +1964,10 @@
           let timer = setInterval(() => go(idx + 1), 4500);
           const car = document.getElementById("carousel");
           car.addEventListener("mouseenter", () => clearInterval(timer));
-          car.addEventListener("mouseleave", () => (timer = setInterval(() => go(idx + 1), 4500)));
+          car.addEventListener(
+            "mouseleave",
+            () => (timer = setInterval(() => go(idx + 1), 4500)),
+          );
         }
         if (window.feather) feather.replace();
       }
@@ -1782,7 +2001,9 @@
         const sec = document.getElementById("promoSec");
         const grid = document.getElementById("promoGrid");
         sec.style.display = "block";
-        grid.innerHTML = promos.map((p) => `<div class="promo-card">${promoCardHtml(p)}</div>`).join("");
+        grid.innerHTML = promos
+          .map((p) => `<div class="promo-card">${promoCardHtml(p)}</div>`)
+          .join("");
         if (window.feather) feather.replace();
 
         // 2) Popup (sekali per sesi) — tampil promo pertama + list sisanya
@@ -1809,7 +2030,10 @@
             ${
               rest.length
                 ? `<div class="pp-extra">${rest
-                    .map((p) => `<div class="pp-mini">🎁 <b>${p.title}</b>${p.description ? " — " + p.description : ""}</div>`)
+                    .map(
+                      (p) =>
+                        `<div class="pp-mini">🎁 <b>${p.title}</b>${p.description ? " — " + p.description : ""}</div>`,
+                    )
                     .join("")}</div>`
                 : ""
             }
@@ -1979,7 +2203,8 @@
             const data = await res.json();
             if (!res.ok) {
               appliedVoucher = null;
-              voucherMsg.textContent = "❌ " + (data.error || "Kode tidak valid");
+              voucherMsg.textContent =
+                "❌ " + (data.error || "Kode tidak valid");
               voucherMsg.style.color = "#d11";
             } else {
               appliedVoucher = {
@@ -2057,7 +2282,10 @@
         const token = await getAuthToken();
         const res = await fetch(BACKEND_URL + "/api/orders", {
           method: "POST",
-          headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: "Bearer " + token } : {}),
+          },
           body: JSON.stringify({
             customer: {
               name,
