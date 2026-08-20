@@ -188,16 +188,35 @@
         transform: translate(2px, 2px);
         box-shadow: 1px 1px 0 var(--ink);
       }
+      .hamburger.active {
+        background: var(--pink);
+        color: #fff;
+        transform: rotate(90deg);
+      }
       .mobile-menu {
-        display: none;
+        display: flex;
         flex-direction: column;
         gap: 10px;
         background: var(--white);
-        border-bottom: var(--border);
-        padding: 6px 16px 18px;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateY(-10px);
+        padding: 0 16px;
+        border-bottom: 3px solid transparent;
+        transition:
+          max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.25s ease,
+          transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+          padding 0.3s ease,
+          border-color 0.2s ease 0.1s;
       }
       .mobile-menu.open {
-        display: flex;
+        max-height: 480px;
+        opacity: 1;
+        transform: translateY(0);
+        padding: 10px 16px 18px;
+        border-bottom-color: var(--ink);
       }
       .mobile-menu-acct {
         font-size: 0.82rem;
@@ -231,6 +250,44 @@
       }
       .mobile-menu-item .cart-count {
         margin-left: auto;
+      }
+      @keyframes menuItemPop {
+        from {
+          opacity: 0;
+          transform: translateY(-8px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .mobile-menu.open .mobile-menu-acct,
+      .mobile-menu.open .mobile-menu-item {
+        animation: menuItemPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .mobile-menu.open .mobile-menu-acct {
+        animation-delay: 0.02s;
+      }
+      .mobile-menu.open .mobile-menu-item:nth-child(2) {
+        animation-delay: 0.06s;
+      }
+      .mobile-menu.open .mobile-menu-item:nth-child(3) {
+        animation-delay: 0.1s;
+      }
+      .mobile-menu.open .mobile-menu-item:nth-child(4) {
+        animation-delay: 0.14s;
+      }
+      .mobile-menu.open .mobile-menu-item:nth-child(5) {
+        animation-delay: 0.18s;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .mobile-menu,
+        .mobile-menu.open .mobile-menu-acct,
+        .mobile-menu.open .mobile-menu-item,
+        .hamburger.active {
+          animation: none !important;
+          transition: none !important;
+        }
       }
 
       /* ---------- HERO ---------- */
@@ -2338,11 +2395,23 @@
       const mobileAcctInfo = document.getElementById("mobileAcctInfo");
       const closeMobileMenu = () => {
         mobileMenu.classList.remove("open");
+        hamburgerBtn.classList.remove("active");
         hamburgerBtn.setAttribute("aria-expanded", "false");
+        const icon = hamburgerBtn.querySelector("[data-feather]");
+        if (icon) {
+          icon.setAttribute("data-feather", "menu");
+          if (window.feather) feather.replace();
+        }
       };
       const openMobileMenu = () => {
         mobileMenu.classList.add("open");
+        hamburgerBtn.classList.add("active");
         hamburgerBtn.setAttribute("aria-expanded", "true");
+        const icon = hamburgerBtn.querySelector("[data-feather]");
+        if (icon) {
+          icon.setAttribute("data-feather", "x");
+          if (window.feather) feather.replace();
+        }
         refreshMobileAcctInfo();
       };
       async function refreshMobileAcctInfo() {
