@@ -170,6 +170,68 @@
       .hide-mobile {
         display: inline-flex;
       }
+      .hamburger {
+        display: none;
+        background: var(--white);
+        border: var(--border);
+        box-shadow: var(--shadow-sm);
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          transform 0.08s,
+          box-shadow 0.08s;
+      }
+      .hamburger:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 var(--ink);
+      }
+      .mobile-menu {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        background: var(--white);
+        border-bottom: var(--border);
+        padding: 6px 16px 18px;
+      }
+      .mobile-menu.open {
+        display: flex;
+      }
+      .mobile-menu-acct {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #666;
+        padding: 6px 2px 2px;
+      }
+      .mobile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: var(--border);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        padding: 12px 14px;
+        font-weight: 700;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.95rem;
+        color: var(--ink);
+        text-decoration: none;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        transition:
+          transform 0.08s,
+          box-shadow 0.08s;
+      }
+      .mobile-menu-item:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 var(--ink);
+      }
+      .mobile-menu-item .cart-count {
+        margin-left: auto;
+      }
 
       /* ---------- HERO ---------- */
       .hero {
@@ -1125,6 +1187,12 @@
         .nav-in {
           padding: 12px 16px;
         }
+        .nav-links {
+          display: none;
+        }
+        .hamburger {
+          display: flex;
+        }
       }
       @media (prefers-reduced-motion: reduce) {
         * {
@@ -1414,6 +1482,25 @@
             <span class="cart-count" id="navCount">0</span>
           </button>
         </div>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Buka menu" aria-expanded="false">
+          <i data-feather="menu"></i>
+        </button>
+      </div>
+      <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-acct" id="mobileAcctInfo">Memuat akun...</div>
+        <a href="/akun.html" class="mobile-menu-item">
+          <i data-feather="user"></i> Akun Saya
+        </a>
+        <button class="mobile-menu-item" id="mobileCartBtn">
+          <i data-feather="shopping-cart"></i> Keranjang
+          <span class="cart-count" id="mobileNavCount">0</span>
+        </button>
+        <a href="#alamat" class="mobile-menu-item" id="mobileAlamatLink">
+          <i data-feather="map-pin"></i> Alamat Toko
+        </a>
+        <a href="#produk" class="mobile-menu-item" id="mobileProdukLink">
+          <i data-feather="grid"></i> Menu Produk
+        </a>
       </div>
     </nav>
 
@@ -2108,6 +2195,8 @@
         const ids = Object.keys(cart);
         const count = ids.reduce((s, id) => s + cart[id], 0);
         navCount.textContent = count;
+        const mobileNavCount = document.getElementById("mobileNavCount");
+        if (mobileNavCount) mobileNavCount.textContent = count;
 
         if (ids.length === 0) {
           cartBody.innerHTML = `<div class="empty"><div class="ic"><i data-feather="shopping-cart"></i></div><p style="font-weight:700;font-family:'Archivo Black'">Keranjang masih kosong</p><p style="font-size:.9rem;margin-top:6px">Yuk pilih cookies favoritmu dulu!</p></div>`;
@@ -2242,6 +2331,58 @@
       };
       document.getElementById("openCart").addEventListener("click", openDrawer);
       document.getElementById("heroCart").addEventListener("click", openDrawer);
+
+      // ====== HAMBURGER MENU (MOBILE) ======
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const mobileAcctInfo = document.getElementById("mobileAcctInfo");
+      const closeMobileMenu = () => {
+        mobileMenu.classList.remove("open");
+        hamburgerBtn.setAttribute("aria-expanded", "false");
+      };
+      const openMobileMenu = () => {
+        mobileMenu.classList.add("open");
+        hamburgerBtn.setAttribute("aria-expanded", "true");
+        refreshMobileAcctInfo();
+      };
+      async function refreshMobileAcctInfo() {
+        if (!mobileAcctInfo) return;
+        if (!sb) {
+          mobileAcctInfo.textContent = "Fitur akun belum aktif";
+          return;
+        }
+        try {
+          const { data } = await sb.auth.getSession();
+          const user = data?.session?.user;
+          mobileAcctInfo.textContent = user
+            ? "Masuk sebagai " + user.email
+            : "Belum masuk — tap Akun Saya";
+        } catch {
+          mobileAcctInfo.textContent = "Belum masuk — tap Akun Saya";
+        }
+      }
+      hamburgerBtn.addEventListener("click", () => {
+        mobileMenu.classList.contains("open")
+          ? closeMobileMenu()
+          : openMobileMenu();
+      });
+      document.addEventListener("click", (e) => {
+        if (
+          mobileMenu.classList.contains("open") &&
+          !mobileMenu.contains(e.target) &&
+          !hamburgerBtn.contains(e.target)
+        ) {
+          closeMobileMenu();
+        }
+      });
+      mobileMenu
+        .querySelectorAll("a.mobile-menu-item")
+        .forEach((a) => a.addEventListener("click", closeMobileMenu));
+      document.getElementById("mobileCartBtn").addEventListener("click", () => {
+        closeMobileMenu();
+        openDrawer();
+      });
+      refreshMobileAcctInfo();
       document
         .getElementById("closeCart")
         .addEventListener("click", closeDrawer);
